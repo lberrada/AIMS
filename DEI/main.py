@@ -6,11 +6,11 @@ Author: Leonard Berrada
 Date: 19 Oct 2015
 """
 
-from data_processing import import_from_file
+from data_processing import process_from_file
 
 filename = 'sotonmet.txt'
 
-data = import_from_file(filename)
+training_df, testing_df = process_from_file(filename)
 
 
 

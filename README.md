@@ -1,6 +1,6 @@
-# AIMS
-Repository for the first year courses of Autonomous Intelligent Machines &amp; Systems program
+# AIMS : Autonomous Intelligent Machines &amp; Systems
+Repository for the first year courses of the AIMS program
 
 List of Modules:
 
-## DEI: Data Estimation & Inference
+## DEI : Data Estimation & Inference
