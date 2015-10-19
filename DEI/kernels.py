@@ -6,29 +6,40 @@ Author: Leonard Berrada
 Date: 19 Oct 2015
 """
 
-kernels_dict = dict()
-
-kernels_dict['gaussian'] = gaussian_kernel
+import numpy as np
 
 
 def gaussian_kernel(X=None,
-                    Xprime=None,
+                    Y=None,
+                    xstar=None,
                     sigma_f=None,
                     sigma_n=None,
                     l=None,
                     epsilon=1e-6):
 
-    assert(X != None and sigma != None and l != None)
+    assert(X != None and Y!=None and sigma_f != None 
+           and sigma_n != None and l != None)
 
-    same_x = np.isclose(X, Xprime, rtol=1e-3)
+    def k(x, xprime):
+        same_x = np.isclose(x[None, :], xprime[:, None], rtol=1e-3)
+        D = x[None, :] - xprime[:, None]
+        k = sigma_f * np.exp(- np.power(D, 2) / (2 * l**2))
+        k[same_x] += sigma_n
 
-    ones_mat = np.ones_like(X).T
-    X_matrix = np.dot(X, ones_mat)
-    Xprime_matrix = np.dot(Xprime, ones_mat)
+        return k
 
-    same_x = np.isclose(X_matrix, Xprime_matrix, rtol=1e-3)
-
-    K = sigma_f * np.exp(- np.power(X_matrix - Xprime_matrix, 2) / (2 * l**2))
-    K[same_x] += sigma_n
+    K = k(X, X)
+    Xstar = xstar * np.ones_like(X)
+    Ks = k(X, Xstar)
+    Kss = sigma_f * np.exp(- np.power(xstar - xstar, 2) / (2 * l**2))
     
+    aux_K = np.dot(Ks, np.linalg.inv(K))
     
+    y_mean = np.dot(aux_K, Y)
+    y_var = Kss - np.dot(aux_K, Ks.T)
+    
+    return y_mean, y_var
+
+kernels_dict = dict()
+
+kernels_dict['gaussian'] = gaussian_kernel
