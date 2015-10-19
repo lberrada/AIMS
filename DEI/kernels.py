@@ -7,6 +7,9 @@ Date: 19 Oct 2015
 """
 
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set(color_codes=True)
 
 
 def gaussian_kernel(X=None,
@@ -17,18 +20,15 @@ def gaussian_kernel(X=None,
                     l=None,
                     epsilon=1e-6):
 
-    def kernel(x, xprime):
-        if x.dtype == "datetime64[ns]":
-            same_x = np.where(x[None, :] == xprime[:, None])
-        else:
-            same_x = np.isclose(x[None, :], xprime[:, None], rtol=1e-3)
-        D = x[None, :] - xprime[:, None]
-        k = sigma_f * np.exp(- np.power(D, 2) / (2 * l**2))
-        k[same_x] += sigma_n
+    if X.dtype == "datetime64[ns]":
+        same_x = np.where(X[None, :] == X[:, None])
+    else:
+        same_x = np.isclose(X[None, :], X[:, None], rtol=1e-3)
+        
+    D = X[None, :] - X[:, None]
+    K = sigma_f * np.exp(- np.power(D, 2) / (2 * l**2))
+    K[same_x] += sigma_n
 
-        return k
-
-    K = kernel(X, X)
     n = len(X)
     diag_indices = [np.arange(n), np.arange(n)]
     K[diag_indices] += epsilon
@@ -62,11 +62,13 @@ def gaussian_kernel(X=None,
         y_var = []
         for xxstar in xstar:
             
-            print(xxstar)
-            
             yy_mean, yy_var = get_y(xxstar)
             y_mean.append(yy_mean)
             y_var.append(yy_var)
+            
+    plt.plot(X, Y, 'bo')
+    plt.plot(xstar, y_mean, 'ro')
+    plt.show()
 
     return y_mean, y_var
 
