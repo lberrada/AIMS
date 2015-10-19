@@ -14,7 +14,8 @@ import seaborn as sns
 sns.set(color_codes=True)
 
 
-def process_from_file(filename):
+def process_from_file(filename,
+                      plot_ts=False):
     """
     """
 
@@ -22,8 +23,11 @@ def process_from_file(filename):
     my_dataframe.rename(columns={'Tide height (m)': 'y',
                                  'Reading Date and Time (ISO)': 't'},
                         inplace=True)
-    
+
     my_dataframe['t'] = pandas.to_datetime(my_dataframe['t'])
+    my_dataframe['t'] -= my_dataframe['t'].ix[0]
+    my_dataframe['t'] = my_dataframe['t'].apply(
+        lambda x: x / np.timedelta64(5, 'm'))
 
     print("data imported in dataframe")
     print('-' * 50)
@@ -47,7 +51,8 @@ def process_from_file(filename):
     print(testing_df.head())
     print('-' * 50)
 
-    training_df.plot()
-    plt.show()
+    if plot_ts:
+        training_df.plot()
+        plt.show()
 
     return training_df, testing_df

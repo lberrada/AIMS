@@ -17,27 +17,57 @@ def gaussian_kernel(X=None,
                     l=None,
                     epsilon=1e-6):
 
-    assert(X != None and Y!=None and sigma_f != None 
-           and sigma_n != None and l != None)
-
-    def k(x, xprime):
-        same_x = np.isclose(x[None, :], xprime[:, None], rtol=1e-3)
+    def kernel(x, xprime):
+        if x.dtype == "datetime64[ns]":
+            same_x = np.where(x[None, :] == xprime[:, None])
+        else:
+            same_x = np.isclose(x[None, :], xprime[:, None], rtol=1e-3)
         D = x[None, :] - xprime[:, None]
         k = sigma_f * np.exp(- np.power(D, 2) / (2 * l**2))
         k[same_x] += sigma_n
 
         return k
 
-    K = k(X, X)
-    Xstar = xstar * np.ones_like(X)
-    Ks = k(X, Xstar)
-    Kss = sigma_f * np.exp(- np.power(xstar - xstar, 2) / (2 * l**2))
-    
-    aux_K = np.dot(Ks, np.linalg.inv(K))
-    
-    y_mean = np.dot(aux_K, Y)
-    y_var = Kss - np.dot(aux_K, Ks.T)
-    
+    K = kernel(X, X)
+    n = len(X)
+    diag_indices = [np.arange(n), np.arange(n)]
+    K[diag_indices] += epsilon
+    inv_K = np.linalg.inv(K)
+
+    def get_y(xxstar):
+        Xstar = xxstar * np.ones_like(X)
+        
+        same_x = np.isclose(X, Xstar, rtol=1e-3)
+        D = X - Xstar
+        Ks = sigma_f * np.exp(- np.power(D, 2) / (2 * l**2))
+        Ks[same_x] += sigma_n
+        
+        Kss = sigma_f * np.exp(- np.power(xxstar - xxstar, 2) / (2 * l**2))
+        
+
+        aux_K = np.dot(Ks, inv_K)
+        
+        yy_mean = np.dot(aux_K, Y)
+        yy_var = Kss - np.dot(aux_K, Ks.T)
+        
+        print(yy_mean, yy_var)
+
+        return yy_mean, yy_var
+
+    if not hasattr(xstar, "__len__"):
+        y_mean, y_var = get_y(xstar)
+
+    else:
+        y_mean = []
+        y_var = []
+        for xxstar in xstar:
+            
+            print(xxstar)
+            
+            yy_mean, yy_var = get_y(xxstar)
+            y_mean.append(yy_mean)
+            y_var.append(yy_var)
+
     return y_mean, y_var
 
 kernels_dict = dict()
