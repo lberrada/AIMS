@@ -37,37 +37,39 @@ def optimize_hp_gaussian(X=None,
         
         log_likelihood = -0.5 * np.dot(Y.T, u) - 0.5 * log_det_K
         
+        
         neg_log_likelihood = -log_likelihood
         
         return neg_log_likelihood
     
     mean_params = np.array([1., 1., 20])
-    sigma_params = np.ones(3)
+    sigma_params = np.array([0.2, 0.2, 0.5])
     log_mean_params = np.log(mean_params)
     
-    def get_neg_posterior_probability(params, *args):
+    def get_neg_log_posterior(params, *args):
+        
+#         negative_params = np.where(params < 0.)[0]
+#         if len(negative_params):
+#             return 1e6 * np.sum(np.abs(params[negative_params]))
+
+        params = np.abs(params)
         
         log_likelihood = -np.array(get_neg_log_likelihood(params))
-        log_params = np.log(params)
-        log_prior = -0.5 * np.sum(sigma_params * np.power((log_params - log_mean_params), 2)) -np.sum(np.abs(log_params))
-#         log_normalization = scipy.integrate.nquad(np.exp(-get_neg_log_likelihood(params))*scipy.stats.norm(log_params-log_mean_params),
-#                                                  -np.infty*np.ones_like(params),
-#                                                  np.infty*np.ones_like(params),
-#                                                  args=params)
+        log_prior = np.sum(scipy.stats.rayleigh.logpdf(params, 
+                                                loc=mean_params,
+                                                scale=sigma_params))
         
-#         log_posterior = log_likelihood + log_prior - log_normalization
         log_posterior = log_likelihood + log_prior
         
         neg_log_posterior = -log_posterior
-        print(neg_log_posterior)
         
         return neg_log_posterior
         
         
         
     
-    init_theta = np.array([1., 1., 25])
-    theta = scipy.optimize.fmin_cg(get_neg_log_likelihood,
+    init_theta = np.array([0.5, 0.5, 25])
+    theta = scipy.optimize.fmin_cg(get_neg_log_posterior,
                                    init_theta)
     
     
