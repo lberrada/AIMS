@@ -28,6 +28,7 @@ def process_from_file(filename,
     my_dataframe['t'] -= my_dataframe['t'].ix[0]
     my_dataframe['t'] = my_dataframe['t'].apply(
         lambda x: x / np.timedelta64(5, 'm'))
+    print(my_dataframe['t'])
 
     print("data imported in dataframe")
     print('-' * 50)

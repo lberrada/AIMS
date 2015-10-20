@@ -20,14 +20,11 @@ def gaussian_kernel(X=None,
                     l=None,
                     epsilon=1e-6):
 
-    if X.dtype == "datetime64[ns]":
-        same_x = np.where(X[None, :] == X[:, None])
-    else:
-        same_x = np.isclose(X[None, :], X[:, None], rtol=1e-3)
+    same_x = np.isclose(X[None, :], X[:, None], rtol=1e-3)
         
     D = X[None, :] - X[:, None]
-    K = sigma_f * np.exp(- np.power(D, 2) / (2 * l**2))
-    K[same_x] += sigma_n
+    K = sigma_f**2 * np.exp(- np.power(D, 2) / (2 * l**2))
+    K[same_x] += sigma_n**2
 
     n = len(X)
     diag_indices = [np.arange(n), np.arange(n)]
@@ -39,10 +36,10 @@ def gaussian_kernel(X=None,
         
         same_x = np.isclose(X, Xstar, rtol=1e-3)
         D = X - Xstar
-        Ks = sigma_f * np.exp(- np.power(D, 2) / (2 * l**2))
-        Ks[same_x] += sigma_n
+        Ks = sigma_f**2 * np.exp(- np.power(D, 2) / (2 * l**2))
+        Ks[same_x] += sigma_n**2
         
-        Kss = sigma_f * np.exp(- np.power(xxstar - xxstar, 2) / (2 * l**2))
+        Kss = sigma_f**2 * np.exp(- np.power(xxstar - xxstar, 2) / (2 * l**2)) + sigma_n**2
         
 
         aux_K = np.dot(Ks, inv_K)

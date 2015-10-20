@@ -59,3 +59,7 @@ target/
 # Eclipse Configuration Files
 .project
 .pydevproject
+
+#Mac Os X File System files
+.DS_Store
+

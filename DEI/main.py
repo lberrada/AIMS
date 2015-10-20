@@ -16,7 +16,16 @@ X = training_df.t.values
 Y = training_df.y.values
 Xstar = testing_df.t.values
 
-y_mean, y_var = gaussian_kernel(X, Y, Xstar, 1, 1, 1)
+sigma_f = 1.
+sigma_n = 1.
+l = 0.1
+
+y_mean, y_var = gaussian_kernel(X=X, 
+                                Y=Y, 
+                                xstar=Xstar, 
+                                sigma_f=sigma_f, 
+                                sigma_n=sigma_n, 
+                                l=l)
 
 
 
