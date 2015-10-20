@@ -7,7 +7,7 @@ Date: 19 Oct 2015
 """
 
 from data_processing import process_from_file
-from kernels import gaussian_kernel
+from kernels import gaussian_kernel, optimize_hp_gaussian
 
 filename = 'sotonmet.txt'
 
@@ -17,15 +17,15 @@ Y = training_df.y.values
 Xstar = testing_df.t.values
 truth = testing_df.ytruth.values
 
-sigma_f = 1.
-sigma_n = 1.
-l = 30
 
-y_mean, y_var = gaussian_kernel(X=X, 
-                                Y=Y, 
-                                xstar=Xstar, 
-                                sigma_f=sigma_f, 
-                                sigma_n=sigma_n, 
+[sigma_f, sigma_n, l] = optimize_hp_gaussian(X,
+                                             Y)
+
+y_mean, y_var = gaussian_kernel(X=X,
+                                Y=Y,
+                                xstar=Xstar,
+                                sigma_f=sigma_f,
+                                sigma_n=sigma_n,
                                 l=l,
                                 truth=truth)
 
