@@ -8,6 +8,8 @@ Date: 19 Oct 2015
 
 import numpy as np
 import scipy.optimize
+import scipy.integrate
+import scipy.stats
 import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set(color_codes=True)
@@ -15,11 +17,13 @@ sns.set(color_codes=True)
 def optimize_hp_gaussian(X=None,
                          Y=None):
     
+    print("optimizing hyper-parameters...")
+    
     n = len(X)
     same_x = [np.arange(n), np.arange(n)]
     D = X[None, :] - X[:, None]
     
-    def get_log_likelihood(params, *args):
+    def get_neg_log_likelihood(params, *args):
         
         sigma_f, sigma_n, l = params
         
@@ -33,16 +37,46 @@ def optimize_hp_gaussian(X=None,
         
         log_likelihood = -0.5 * np.dot(Y.T, u) - 0.5 * log_det_K
         
-        return -log_likelihood
+        neg_log_likelihood = -log_likelihood
+        
+        return neg_log_likelihood
+    
+    mean_params = np.array([1., 1., 20])
+    sigma_params = np.ones(3)
+    log_mean_params = np.log(mean_params)
+    
+    def get_neg_posterior_probability(params, *args):
+        
+        log_likelihood = -np.array(get_neg_log_likelihood(params))
+        log_params = np.log(params)
+        log_prior = -0.5 * np.sum(sigma_params * np.power((log_params - log_mean_params), 2)) -np.sum(np.abs(log_params))
+#         log_normalization = scipy.integrate.nquad(np.exp(-get_neg_log_likelihood(params))*scipy.stats.norm(log_params-log_mean_params),
+#                                                  -np.infty*np.ones_like(params),
+#                                                  np.infty*np.ones_like(params),
+#                                                  args=params)
+        
+#         log_posterior = log_likelihood + log_prior - log_normalization
+        log_posterior = log_likelihood + log_prior
+        
+        neg_log_posterior = -log_posterior
+        print(neg_log_posterior)
+        
+        return neg_log_posterior
+        
+        
+        
     
     init_theta = np.array([1., 1., 25])
-    theta = scipy.optimize.fmin_cg(get_log_likelihood,
+    theta = scipy.optimize.fmin_cg(get_neg_log_likelihood,
                                    init_theta)
     
-    print('parameters found:')
+    
+    
+    print('done')
+    print('Parameters found:')
     print('sigma_f :', theta[0])
     print('sigma_n :', theta[1])
-    print('sigma_l :', theta[2])
+    print('l :', theta[2])
     print('-' * 50)
     
     return theta.tolist()
@@ -56,6 +90,8 @@ def gaussian_kernel(X=None,
                     l=None,
                     truth=None,
                     jitter=1e-6):
+    
+    print("predicting data...")
     
     n = len(X)
     same_x = [np.arange(n), np.arange(n)]
@@ -96,15 +132,29 @@ def gaussian_kernel(X=None,
             y_mean.append(yy_mean)
             y_var.append(yy_var)
             
+    print("done")
+    print("-"*50)
+    
+    print("displaying results...")
+    
+    plt.plot(X,
+             Y,
+             'go',
+             alpha=0.5)
+            
     plt.plot(xstar,
              truth,
-             'bo')
+             'bo',
+             alpha=0.5)
+    
     plt.errorbar(xstar,
                  y_mean,
                  c='red',
                  yerr=1.96 * np.sqrt(y_var),
-                 alpha=0.3)
+                 alpha=0.5)
     plt.show()
+    
+    print("done")
 
     return y_mean, y_var
 

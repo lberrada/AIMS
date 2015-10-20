@@ -15,25 +15,36 @@ sns.set(color_codes=True)
 
 
 def process_from_file(filename,
+                      variable='tide',
                       plot_ts=False):
     """
     """
-
+    
+    print("importing data in dataframe...")
     my_dataframe = pandas.read_csv(filename)
-#     my_dataframe.rename(columns={'Tide height (m)': 'y',
-    my_dataframe.rename(columns={'Air temperature (C)': 'y',
-                                 'True air temperature (C)': 'ytruth',
-                                 'Reading Date and Time (ISO)': 't'},
-                        inplace=True)
+    if variable == 'tide':
+        my_dataframe.rename(columns={'Tide height (m)': 'y',
+                                     'True tide height (m)': 'ytruth',
+                                     'Reading Date and Time (ISO)': 't'},
+                            inplace=True)
+    elif variable == 'temperature':
+        my_dataframe.rename(columns={'Air temperature (C)': 'y',
+                                     'True air temperature (C)': 'ytruth',
+                                     'Reading Date and Time (ISO)': 't'},
+                            inplace=True)
+    else:
+        raise ValueError("Wrong predictor argument (%s), should be 'tide' or 'temperature'" % variable)
 
     my_dataframe['t'] = pandas.to_datetime(my_dataframe['t'])
     my_dataframe['t'] -= my_dataframe['t'].ix[0]
     my_dataframe['t'] = my_dataframe['t'].apply(
         lambda x: x / np.timedelta64(5, 'm'))
 
-    print("data imported in dataframe")
+    print("done")
     print('-' * 50)
-
+    
+    print("creating training and testing dataframes...")
+    
     testing_indices = my_dataframe['y'].index[
         my_dataframe['y'].apply(np.isnan)]
 
@@ -43,7 +54,7 @@ def process_from_file(filename,
     training_df = my_dataframe[['t', 'y', 'ytruth']].ix[training_indices]
     testing_df = my_dataframe[['t', 'y', 'ytruth']].ix[testing_indices]
 
-    print("training and testing dataframes created")
+    print("done")
     print('-' * 50)
 
     print("Showing headers for verification:")
