@@ -15,17 +15,19 @@ training_df, testing_df = process_from_file(filename)
 X = training_df.t.values
 Y = training_df.y.values
 Xstar = testing_df.t.values
+truth = testing_df.ytruth.values
 
 sigma_f = 1.
 sigma_n = 1.
-l = 0.1
+l = 30
 
 y_mean, y_var = gaussian_kernel(X=X, 
                                 Y=Y, 
                                 xstar=Xstar, 
                                 sigma_f=sigma_f, 
                                 sigma_n=sigma_n, 
-                                l=l)
+                                l=l,
+                                truth=truth)
 
 
 

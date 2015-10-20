@@ -20,7 +20,9 @@ def process_from_file(filename,
     """
 
     my_dataframe = pandas.read_csv(filename)
-    my_dataframe.rename(columns={'Tide height (m)': 'y',
+#     my_dataframe.rename(columns={'Tide height (m)': 'y',
+    my_dataframe.rename(columns={'Air temperature (C)': 'y',
+                                 'True air temperature (C)': 'ytruth',
                                  'Reading Date and Time (ISO)': 't'},
                         inplace=True)
 
@@ -28,7 +30,6 @@ def process_from_file(filename,
     my_dataframe['t'] -= my_dataframe['t'].ix[0]
     my_dataframe['t'] = my_dataframe['t'].apply(
         lambda x: x / np.timedelta64(5, 'm'))
-    print(my_dataframe['t'])
 
     print("data imported in dataframe")
     print('-' * 50)
@@ -39,8 +40,8 @@ def process_from_file(filename,
     n_rows = len(my_dataframe.index)
     training_indices = [i for i in range(n_rows) if i not in testing_indices]
 
-    training_df = my_dataframe[['t', 'y']].ix[training_indices]
-    testing_df = my_dataframe[['t', 'y']].ix[testing_indices]
+    training_df = my_dataframe[['t', 'y', 'ytruth']].ix[training_indices]
+    testing_df = my_dataframe[['t', 'y', 'ytruth']].ix[testing_indices]
 
     print("training and testing dataframes created")
     print('-' * 50)
