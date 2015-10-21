@@ -15,7 +15,7 @@ from tune import optimize_hyperparameters
 filename = 'sotonmet.txt'
 
 variable = 'temperature'
-use_kernel='gaussian_2'
+use_kernel='locally_periodic'
 
 training_df, testing_df = process_from_file(filename,
                                             variable=variable)

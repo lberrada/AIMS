@@ -51,10 +51,10 @@ def locally_periodic_kernel(X1=None,
                             params=None,
                             **kwargs):
     
-    sigma, sigma_n, p, scale, scale_2 = params
+    sigma_n, sigma_f, scale, p, scale_2 = params
     
     D = X1 - X2
-    K = sigma ** 2 * np.exp(-np.power(D, 2) / (2 * scale ** 2))
+    K = sigma_f ** 2 * np.exp(-np.power(D, 2) / (2 * scale ** 2))
     K *= np.exp(-2 * np.sin(np.pi * np.abs(D) / p) ** 2 / (scale_2 ** 2))
     
     if len(D.shape) == 2:
