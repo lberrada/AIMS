@@ -36,7 +36,8 @@ def process_from_file(filename,
         raise ValueError("Wrong predictor argument (%s), should be 'tide' or 'temperature'" % variable)
 
     my_dataframe['t'] = pandas.to_datetime(my_dataframe['t'])
-    my_dataframe['t'] -= my_dataframe['t'].ix[0]
+    t0 = copy.copy(my_dataframe['t'].ix[0])
+    my_dataframe['t'] -= t0
     my_dataframe['t'] = my_dataframe['t'].apply(
         lambda x: x / np.timedelta64(5, 'm'))
 
@@ -74,5 +75,6 @@ def process_from_file(filename,
     Xstar = testing_df.t.values
     Ytruth = testing_df.ytruth.values
     Ytruth -= np.mean(Ytruth)
+    t0 = np.datetime64(t0)
     
-    return X, Y, Xstar, Ytruth
+    return X, Y, Xstar, Ytruth, t0

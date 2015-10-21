@@ -10,9 +10,8 @@ import seaborn as sns
 from kernels import gaussian_kernel, gaussian_kernel_2, locally_periodic_kernel, \
     matern_kernel
 import copy
+import csv
 sns.set(color_codes=True)
-
-
     
 
 def predict(Xtraining=None,
@@ -21,7 +20,11 @@ def predict(Xtraining=None,
             params=None,
             Ytestingtruth=None,
             use_kernel="gaussian",
-            sequential_mode=False):
+            sequential_mode=False,
+            variable=None,
+            estimator=None,
+            t0=None,
+            show_plot=True):
     
     print("predicting data...")
     
@@ -93,31 +96,51 @@ def predict(Xtraining=None,
     ssres = np.sum(np.power(Ypredicted - Ytestingtruth, 2))
     sstot = np.sum(np.power(Ypredicted - np.mean(Ypredicted), 2))
     r2 = 1 - ssres / sstot
+    print(r2)
+    
+    filename = use_kernel + "-" + estimator + "-" + variable + ".csv"
+            
+    with open(filename, 'a', newline='') as csvfile:
+        my_writer = csv.writer(csvfile, delimiter='\t',
+                               quoting=csv.QUOTE_MINIMAL)
+        my_writer.writerow([round(r2, 3)])
 
     print("done")
     print("-"*50)
     
-    print("displaying results...")
-    plt.suptitle("R^2 : " + str(np.round(r2, 4)))
+    print("creating plot...")
     
-    plt.errorbar(Xtesting,
+    Ttesting = np.array([t0] * len(Xtesting), dtype='datetime64')
+    Ttesting += np.array([np.timedelta64(int(x) * 5, 'm') for x in Xtesting], dtype=np.timedelta64)
+    
+    plt.errorbar(Ttesting,
                  Ypredicted,
+                 fmt='o',
+                 ms=4,
                  color='red',
                  ecolor='red',
                  yerr=1.96 * np.sqrt(Yvar),
-                 alpha=0.5)
+                 alpha=0.3)
     
-    plt.plot(Xtraining,
-             Ytraining,
-             'go',
-             alpha=0.5)
-            
-    plt.plot(Xtesting,
+    plt.plot(Ttesting,
              Ytestingtruth,
-             'bo',
-             alpha=0.5)
+             'bo-',
+             ms=4,
+             alpha=0.7)
     
-    plt.show()
+    plt.plot(Ttesting,
+             Ypredicted,
+             'ro',
+             ms=4)
     
+    fig_name = filename.replace("csv", "png")
+    plt.savefig(fig_name,
+                transparent=False,
+                dpi=200,
+                bbox_inches='tight')
+    
+    if show_plot:
+        plt.show()
+        
     print("done")
 
