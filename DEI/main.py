@@ -23,13 +23,12 @@ sequential_mode = True
 Xtraining, Ytraining, Xtesting, Ytestingtruth = process_from_file(filename,
                                                                   variable=variable)
 
-# params = optimize_hyperparameters(Xtraining,
-#                                   Ytraining,
-#                                   use_kernel=use_kernel,
-#                                   estimator=estimator,
-#                                   variable=variable)
-import numpy as np
-params = np.array([1., 1., 10., 2, 50])
+params = optimize_hyperparameters(Xtraining,
+                                  Ytraining,
+                                  use_kernel=use_kernel,
+                                  estimator=estimator,
+                                  variable=variable)
+
 predict(Xtraining=Xtraining,
         Ytraining=Ytraining,
         Xtesting=Xtesting,
