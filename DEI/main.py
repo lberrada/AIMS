@@ -17,8 +17,8 @@ def run(filename,
         estimator,
         sequential_mode):
 
-    Xtraining, Ytraining, Xtesting, Ytestingtruth, t0 = process_from_file(filename,
-                                                                      variable=variable)
+    Xtraining, Ytraining, Xtesting, Ytestingtruth, t0, ymean = process_from_file(filename,
+                                                                                 variable=variable)
     
     params = optimize_hyperparameters(Xtraining,
                                       Ytraining,
@@ -36,6 +36,7 @@ def run(filename,
             estimator=estimator,
             variable=variable,
             t0=t0,
+            ymean=ymean,
             show_plot=False)
     
 

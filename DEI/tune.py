@@ -24,53 +24,53 @@ def optimize_hyperparameters(Xtraining=None,
         if variable == "temperature":
             mean_params = np.array([1., 1., 10.])
             sigma_params = np.array([10., 10., 10.])
-            init_theta = np.array([10., 0.5, 25])
+            init_theta = np.array([1., 0.5, 25])
         
         elif variable=="tide":
             mean_params = np.array([1., 1., 10.])
             sigma_params = np.array([10., 10., 10.])
-            init_theta = np.array([10., 0.5, 25])
+            init_theta = np.array([1., 0.5, 25])
             
     elif use_kernel == "gaussian_2":
         kernel = gaussian_kernel_2
         if variable == "temperature":
             mean_params = np.array([1., 1., 10., 0.1, 248.])
             sigma_params = np.array([10., 10., 10., 10., 10.])
-            init_theta = np.array([10., 0.5, 25, 1., 250.])
+            init_theta = np.array([1., 0.5, 25, 1., 250.])
             
         elif variable=="tide":
             mean_params = np.array([1., 1., 10., 0.1, 100.])
             sigma_params = np.array([10., 10., 10., 10., 20.])
-            init_theta = np.array([10., 0.5, 25, 1., 100.])
+            init_theta = np.array([1., 0.5, 25, 1., 100.])
         
     elif use_kernel == "locally_periodic":
         kernel = locally_periodic_kernel
         if variable == "temperature":
-            mean_params = np.array([1., 1., 10., 2, 120])
-            sigma_params = np.array([10., 10., 10., 10., 10.])
-            init_theta = np.array([10., 0.5, 25, 2., 100.])
+            mean_params = np.array([1., 1., 10., 1.])
+            sigma_params = np.array([10., 10., 10., 10.])
+            init_theta = np.array([1., 0.5, 25, 2.])
             
         elif variable=="tide":
-            mean_params = np.array([1., 1., 10., 2, 50])
-            sigma_params = np.array([10., 10., 10., 10., 20.])
-            init_theta = np.array([10., 0.5, 25, 2., 50.])
+            mean_params = np.array([1., 1., 10., 2])
+            sigma_params = np.array([10., 10., 10., 10.])
+            init_theta = np.array([1., 0.5, 25, 2.])
     
     elif use_kernel == "matern":
         kernel = matern_kernel
         if variable == "temperature":
             mean_params = np.array([1., 1., 10., 3])
             sigma_params = np.array([10., 10., 10., 1.])
-            init_theta = np.array([10., 0.5, 25, 3.])
+            init_theta = np.array([1., 0.5, 25, 3.])
         
         elif variable=="tide":
             mean_params = np.array([1., 1., 10., 3.])
             sigma_params = np.array([10., 10., 10., 1.])
-            init_theta = np.array([10., 0.5, 25, 3.])
+            init_theta = np.array([1., 0.5, 25, 3.])
     
     else:
         raise ValueError("%s kernel not implemented:" % use_kernel)
         
-    bounds = [(1e-2, None)] * len(init_theta)
+    bounds = [(1e-6, None)] * len(init_theta)
     
     def get_neg_log_likelihood(params,
                                *args,
@@ -91,7 +91,6 @@ def optimize_hyperparameters(Xtraining=None,
         neg_log_likelihood = -log_likelihood
         
         return neg_log_likelihood
-    
     
     
     def get_neg_log_posterior(params,
@@ -127,15 +126,14 @@ def optimize_hyperparameters(Xtraining=None,
     
     print('done')
     print('Parameters found:')
-    print('sigma_f :', params_found[0])
-    print('sigma_n :', params_found[1])
+    print('sigma_n :', params_found[0])
+    print('sigma_f :', params_found[1])
     print('scale :', params_found[2])
     if use_kernel == "gaussian_2":
         print('sigma_f_2 :', params_found[3])
         print('scale_2 :', params_found[4])
     elif use_kernel == "locally_periodic":
-        print('p :', params_found[3])
-        print('scale_2 :', params_found[4])
+        print('nu :', params_found[3])
     print('-' * 50)
     
     filename = use_kernel + "-" + estimator + "-" + variable + ".csv"

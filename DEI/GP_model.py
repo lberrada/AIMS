@@ -11,6 +11,7 @@ from kernels import gaussian_kernel, gaussian_kernel_2, locally_periodic_kernel,
     matern_kernel
 import copy
 import csv
+from means import nearest_neighbour_mean
 sns.set(color_codes=True)
     
 
@@ -24,6 +25,7 @@ def predict(Xtraining=None,
             variable=None,
             estimator=None,
             t0=None,
+            ymean=None,
             show_plot=True):
     
     print("predicting data...")
@@ -81,13 +83,13 @@ def predict(Xtraining=None,
         aux = np.linalg.solve(L, Ks.T)
         KsxK_inv = np.linalg.solve(L.T, aux).T
         
-        Ypredicted[i] = np.dot(KsxK_inv, Ytraining)
+        Ypredicted[i] = np.dot(KsxK_inv, Ytraining) + ymean
         Yvar[i] = Kss - np.dot(KsxK_inv, Ks.T)
         
     if sequential_mode:
         Xtraining = savedXtraining 
         Ytraining = savedYtraining
-        
+    
     print("done")
     print("-"*50)
     
@@ -124,7 +126,7 @@ def predict(Xtraining=None,
     
     plt.plot(Ttesting,
              Ytestingtruth,
-             'bo-',
+             'ko-',
              ms=4,
              alpha=0.7)
     
@@ -141,6 +143,8 @@ def predict(Xtraining=None,
     
     if show_plot:
         plt.show()
+    else:
+        plt.close()
         
     print("done")
 
