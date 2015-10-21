@@ -12,17 +12,21 @@ from tune import optimize_hyperparameters
 
 filename = 'sotonmet.txt'
 
-variable = 'temperature'
+variable = 'tide'
 # use_kernel='gaussian'
 # use_kernel='gaussian_2'
-use_kernel='locally_periodic'
+use_kernel = 'locally_periodic'
+# use_kernel = 'matern'
+estimator = "MAP"
 
 Xtraining, Ytraining, Xtesting, Ytestingtruth = process_from_file(filename,
                                                                   variable=variable)
 
 params = optimize_hyperparameters(Xtraining,
                                   Ytraining,
-                                  use_kernel=use_kernel)
+                                  use_kernel=use_kernel,
+                                  estimator=estimator,
+                                  variable=variable)
 
 predict(Xtraining=Xtraining,
         Ytraining=Ytraining,

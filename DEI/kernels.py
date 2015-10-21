@@ -7,6 +7,7 @@ Date: 19 Oct 2015
 """
 
 import numpy as np
+import scipy.special
 
 def gaussian_kernel(X1=None,
                     X2=None,
@@ -67,5 +68,32 @@ def locally_periodic_kernel(X1=None,
     
     return K
     
-    pass
-
+def matern_kernel(X1=None,
+                  X2=None,
+                  params=None,
+                  **kwargs):
+    
+    sigma_n, sigma_f, scale, nu = params
+    
+    D = np.abs(X1 - X2)
+    
+    auxx = 2 * np.sqrt(nu) * D / scale
+    
+    aux1 = (1. / (scipy.special.gamma(D) * 2 ** (nu - 1)))
+    aux2 = np.power(auxx, nu)
+    aux3 = scipy.special.kv(nu, auxx + 1e-6)
+    
+    K = sigma_f ** 2 * aux1 * aux2 * aux3
+    
+    if len(D.shape) == 2:
+        n = len(D)
+        same_x = [np.arange(n), np.arange(n)]
+        K[same_x] += sigma_n ** 2
+        
+    elif not hasattr(D, "__len__"):
+        K += sigma_n ** 2
+    
+    return K
+    
+    
+    

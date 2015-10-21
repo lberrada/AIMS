@@ -7,7 +7,8 @@ Date: 21 Oct 2015
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from kernels import gaussian_kernel, gaussian_kernel_2, locally_periodic_kernel
+from kernels import gaussian_kernel, gaussian_kernel_2, locally_periodic_kernel,\
+    matern_kernel
 sns.set(color_codes=True)
 
 
@@ -30,6 +31,9 @@ def predict(Xtraining=None,
         
     elif use_kernel == "locally_periodic":
         kernel = locally_periodic_kernel
+        
+    elif use_kernel == "matern":
+        kernel = matern_kernel
         
     else:
         raise ValueError("%s kernel not implemented:" % use_kernel)

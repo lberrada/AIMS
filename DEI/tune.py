@@ -7,32 +7,65 @@ Date: 21 Oct 2015
 import numpy as np
 import scipy.stats
 import scipy.optimize
-from kernels import gaussian_kernel, gaussian_kernel_2, locally_periodic_kernel
+from kernels import gaussian_kernel, gaussian_kernel_2, locally_periodic_kernel,\
+    matern_kernel
 
 def optimize_hyperparameters(Xtraining=None,
                              Ytraining=None,
-                             use_kernel="gaussian"):
+                             use_kernel="gaussian",
+                             estimator="MAP",
+                             variable=None):
     
     print("optimizing hyper-parameters...")
     
     if use_kernel == "gaussian":
         kernel = gaussian_kernel
-        mean_params = np.array([1., 1., 10.])
-        sigma_params = np.array([10., 10., 10.])
-        init_theta = np.array([10., 0.5, 25])
+        if variable == "temperature":
+            mean_params = np.array([1., 1., 10.])
+            sigma_params = np.array([10., 10., 10.])
+            init_theta = np.array([10., 0.5, 25])
         
+        elif variable=="tide":
+            mean_params = np.array([1., 1., 10.])
+            sigma_params = np.array([10., 10., 10.])
+            init_theta = np.array([10., 0.5, 25])
+            
     elif use_kernel == "gaussian_2":
         kernel = gaussian_kernel_2
-        mean_params = np.array([1., 1., 10., 0.1, 248.])
-        sigma_params = np.array([10., 10., 10., 10., 10.])
-        init_theta = np.array([10., 0.5, 25, 1., 250.])
+        if variable == "temperature":
+            mean_params = np.array([1., 1., 10., 0.1, 248.])
+            sigma_params = np.array([10., 10., 10., 10., 10.])
+            init_theta = np.array([10., 0.5, 25, 1., 250.])
+            
+        elif variable=="tide":
+            mean_params = np.array([1., 1., 10., 0.1, 100.])
+            sigma_params = np.array([10., 10., 10., 10., 20.])
+            init_theta = np.array([10., 0.5, 25, 1., 100.])
         
     elif use_kernel == "locally_periodic":
         kernel = locally_periodic_kernel
-        mean_params = np.array([1., 1., 10., 2, 120])
-        sigma_params = np.array([10., 10., 10., 10., 10.])
-        init_theta = np.array([10., 0.5, 25, 2., 100.])
+        if variable == "temperature":
+            mean_params = np.array([1., 1., 10., 2, 120])
+            sigma_params = np.array([10., 10., 10., 10., 10.])
+            init_theta = np.array([10., 0.5, 25, 2., 100.])
+            
+        elif variable=="tide":
+            mean_params = np.array([1., 1., 10., 2, 50])
+            sigma_params = np.array([10., 10., 10., 10., 20.])
+            init_theta = np.array([10., 0.5, 25, 2., 50.])
+    
+    elif use_kernel == "matern":
+        kernel = matern_kernel
+        if variable == "temperature":
+            mean_params = np.array([1., 1., 10., 3])
+            sigma_params = np.array([10., 10., 10., 1.])
+            init_theta = np.array([10., 0.5, 25, 3.])
         
+        elif variable=="tide":
+            mean_params = np.array([1., 1., 10., 3.])
+            sigma_params = np.array([10., 10., 10., 1.])
+            init_theta = np.array([10., 0.5, 25, 3.])
+    
     else:
         raise ValueError("%s kernel not implemented:" % use_kernel)
         
@@ -75,10 +108,16 @@ def optimize_hyperparameters(Xtraining=None,
         
         return neg_log_posterior
         
+    if estimator.lower() == "mle":
+        fitness_function = get_neg_log_likelihood
+        
+    elif estimator.lower() == "map":
+        fitness_function = get_neg_log_posterior
     
-    
+    else:
+        raise ValueError("%s estimator is not implemented: should be 'MLE' or 'MAP'" % estimator)
 
-    theta = scipy.optimize.fmin_l_bfgs_b(get_neg_log_posterior,
+    theta = scipy.optimize.fmin_l_bfgs_b(fitness_function,
                                          init_theta,
                                          approx_grad=True,
                                          bounds=bounds)
