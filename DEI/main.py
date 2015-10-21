@@ -9,7 +9,8 @@ Date: 19 Oct 2015
 import numpy as np
 
 from data_processing import process_from_file
-from kernels import gaussian_kernel, optimize_hp_gaussian
+from GP_model import predict
+from tune import optimize_hyperparameters
 
 filename = 'sotonmet.txt'
 
@@ -24,16 +25,18 @@ truth = testing_df.ytruth.values
 truth -= np.mean(truth)
 
 
-[sigma_f, sigma_n, l] = optimize_hp_gaussian(X,
-                                             Y)
+# [sigma_f, sigma_n, l] = optimize_hyperparameters(X,
+#                                              Y)
 
-y_mean, y_var = gaussian_kernel(X=X,
-                                Y=Y,
-                                xstar=Xstar,
-                                sigma_f=sigma_f,
-                                sigma_n=sigma_n,
-                                l=l,
-                                truth=truth)
+[sigma_f, sigma_n, l] = [1., 0.5, 25]
+
+y_mean, y_var = predict(X=X,
+                        Y=Y,
+                        xstar=Xstar,
+                        sigma_f=sigma_f,
+                        sigma_n=sigma_n,
+                        l=l,
+                        truth=truth)
 
 
 
