@@ -14,8 +14,11 @@ from tune import optimize_hyperparameters
 
 filename = 'sotonmet.txt'
 
+variable = 'temperature'
+use_kernel='gaussian_2'
+
 training_df, testing_df = process_from_file(filename,
-                                            variable='temperature')
+                                            variable=variable)
 
 X = training_df.t.values
 Y = training_df.y.values
@@ -25,18 +28,18 @@ truth = testing_df.ytruth.values
 truth -= np.mean(truth)
 
 
-# [sigma_f, sigma_n, l] = optimize_hyperparameters(X,
-#                                              Y)
+params = optimize_hyperparameters(X,
+                                  Y,
+                                  use_kernel=use_kernel)
 
-[sigma_f, sigma_n, l] = [1., 0.5, 25]
+# [sigma_f, sigma_n, l] = [1., 0.5, 25]
 
 y_mean, y_var = predict(X=X,
                         Y=Y,
                         xstar=Xstar,
-                        sigma_f=sigma_f,
-                        sigma_n=sigma_n,
-                        l=l,
-                        truth=truth)
+                        params=params,
+                        truth=truth,
+                        use_kernel=use_kernel)
 
 
 

@@ -7,22 +7,38 @@ Date: 21 Oct 2015
 import numpy as np
 import scipy.stats
 import scipy.optimize
-from kernels import gaussian_kernel
+from kernels import gaussian_kernel, gaussian_kernel_2
 
 def optimize_hyperparameters(X=None,
-                             Y=None):
+                             Y=None,
+                             use_kernel="gaussian"):
     
     print("optimizing hyper-parameters...")
     
-    def get_neg_log_likelihood(params, *args):
+    if use_kernel =="gaussian":
+        kernel = gaussian_kernel
+        mean_params = np.array([1., 1., 10.])
+        sigma_params = np.array([10., 10., 10.])
+        init_theta = np.array([10., 0.5, 25])
         
-        sigma_f, sigma_n, l = params
+    elif use_kernel=="gaussian_2":
+        kernel = gaussian_kernel_2
+        mean_params = np.array([1., 1., 10., 0.1, 248.])
+        sigma_params = np.array([10., 10., 10., 10., 10.])
+        init_theta = np.array([10., 0.5, 25, 1., 250.])
         
-        K = gaussian_kernel(X1=X[None, :],
-                            X2=X[:, None],
-                            sigma_f=sigma_f,
-                            sigma_n=sigma_n,
-                            scale=l)
+    else:
+        raise ValueError("%s kernel not implemented: should be 'gaussian' or 'gaussian_2'" % use_kernel)
+        
+    bounds = [(1e-2, None)] * len(init_theta)
+    
+    def get_neg_log_likelihood(params,
+                               *args,
+                               **kwargs):
+        
+        K = kernel(X1=X[None, :],
+                   X2=X[:, None],
+                   params=params)
         
         L = np.linalg.cholesky(K)
         aux_u = np.linalg.solve(L, Y)
@@ -36,17 +52,16 @@ def optimize_hyperparameters(X=None,
         
         return neg_log_likelihood
     
-    mean_params = np.array([5., 1., 25.])
-    sigma_params = np.array([3., 1., 10.])
     
-    def get_neg_log_posterior(params, *args):
+    
+    def get_neg_log_posterior(params,
+                              *args,
+                              **kwargs):
         
-        params = np.abs(params)
-        
-        log_likelihood = -np.array(get_neg_log_posterior(params))
-        log_prior = np.sum(scipy.stats.norm.logpdf(params,
-                                                loc=mean_params,
-                                                scale=sigma_params)) - np.sum(np.log(np.abs(params)))
+        log_likelihood = -np.array(get_neg_log_likelihood(params))
+        log_prior = np.sum(scipy.stats.norm.logpdf(np.log(params),
+                                                loc=np.log(mean_params),
+                                                scale=sigma_params)) - np.sum(np.log(params))
         
         log_posterior = log_likelihood + log_prior
         
@@ -54,20 +69,24 @@ def optimize_hyperparameters(X=None,
         
         return neg_log_posterior
         
-        
-        
-    
-    init_theta = np.array([10., 0.5, 25])
-    theta = scipy.optimize.fmin_cg(get_neg_log_likelihood,
-                                   init_theta)
     
     
+
+    theta = scipy.optimize.fmin_l_bfgs_b(get_neg_log_posterior,
+                                         init_theta,
+                                         approx_grad=True,
+                                         bounds=bounds)
+    
+    params_found = theta[0]
     
     print('done')
     print('Parameters found:')
-    print('sigma_f :', theta[0])
-    print('sigma_n :', theta[1])
-    print('l :', theta[2])
+    print('sigma_f :', params_found[0])
+    print('sigma_n :', params_found[1])
+    print('scale :', params_found[2])
+    if use_kernel=="gaussian_2":
+        print('sigma_f_2 :', params_found[3])
+        print('scale_2 :', params_found[4])
     print('-' * 50)
     
-    return theta.tolist()
+    return params_found.tolist()

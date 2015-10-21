@@ -7,7 +7,7 @@ Date: 21 Oct 2015
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from kernels import gaussian_kernel
+from kernels import gaussian_kernel, gaussian_kernel_2
 sns.set(color_codes=True)
 
 
@@ -16,36 +16,34 @@ sns.set(color_codes=True)
 def predict(X=None,
             Y=None,
             xstar=None,
-            sigma_f=None,
-            sigma_n=None,
-            l=None,
+            params=None,
             truth=None,
-            jitter=1e-6):
+            use_kernel="gaussian"):
     
     print("predicting data...")
     
-    K = gaussian_kernel(X1=X[None, :], 
-                        X2=X[:, None],
-                        sigma_f=sigma_f,
-                        sigma_n=sigma_n,
-                        scale=l)
+    if use_kernel =="gaussian":
+        kernel = gaussian_kernel
+        
+    elif use_kernel=="gaussian_2":
+        kernel = gaussian_kernel_2
+    
+    K = kernel(X1=X[None, :], 
+               X2=X[:, None],
+               params=params)
 
     L = np.linalg.cholesky(K)
 
     def get_y(xxstar):
 
         Xstar = xxstar * np.ones_like(X)
-        Ks = gaussian_kernel(X1=X, 
-                            X2=Xstar,
-                            sigma_f=sigma_f,
-                            sigma_n=sigma_n,
-                            scale=l)
+        Ks = kernel(X1=X, 
+                    X2=Xstar,
+                    params=params)
         
-        Kss = gaussian_kernel(X1=xxstar, 
-                            X2=xxstar,
-                            sigma_f=sigma_f,
-                            sigma_n=sigma_n,
-                            scale=l)
+        Kss = kernel(X1=xxstar, 
+                     X2=xxstar,
+                     params=params)
             
         aux = np.linalg.solve(L, Ks.T)
         KsxK_inv = np.linalg.solve(L.T, aux).T
