@@ -7,8 +7,9 @@ Date: 21 Oct 2015
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from kernels import gaussian_kernel, gaussian_kernel_2, locally_periodic_kernel,\
+from kernels import gaussian_kernel, gaussian_kernel_2, locally_periodic_kernel, \
     matern_kernel
+import copy
 sns.set(color_codes=True)
 
 
@@ -19,14 +20,15 @@ def predict(Xtraining=None,
             Xtesting=None,
             params=None,
             Ytestingtruth=None,
-            use_kernel="gaussian"):
+            use_kernel="gaussian",
+            sequential_mode=False):
     
     print("predicting data...")
     
-    if use_kernel =="gaussian":
+    if use_kernel == "gaussian":
         kernel = gaussian_kernel
         
-    elif use_kernel=="gaussian_2":
+    elif use_kernel == "gaussian_2":
         kernel = gaussian_kernel_2
         
     elif use_kernel == "locally_periodic":
@@ -38,7 +40,7 @@ def predict(Xtraining=None,
     else:
         raise ValueError("%s kernel not implemented:" % use_kernel)
     
-    K = kernel(X1=Xtraining[None, :], 
+    K = kernel(X1=Xtraining[None, :],
                X2=Xtraining[:, None],
                params=params)
 
@@ -46,16 +48,30 @@ def predict(Xtraining=None,
 
     Ypredicted = np.zeros_like(Xtesting)
     Yvar = np.zeros_like(Xtesting)
-    for i in range(len(Xtesting)):
+    index = 0
+    
+    if sequential_mode:
+        training_len = len(Xtraining)
+        savedXtraining = copy.copy(Xtraining)
+        savedYtraining = copy.copy(Ytraining)
+    
+    for i in range(1, len(Xtesting)):
         
         xstar = Xtesting[i]
         
+        if sequential_mode:
+            while index < training_len and savedXtraining[index] < xstar:
+                index += 1
+            L = np.linalg.cholesky(K[:index, :index])
+            Xtraining = savedXtraining[:index]
+            Ytraining = savedYtraining[:index]
+        
         Xstar = xstar * np.ones_like(Xtraining)
-        Ks = kernel(X1=Xtraining, 
+        Ks = kernel(X1=Xtraining,
                     X2=Xstar,
                     params=params)
         
-        Kss = kernel(X1=xstar, 
+        Kss = kernel(X1=xstar,
                      X2=xstar,
                      params=params)
             
@@ -64,6 +80,10 @@ def predict(Xtraining=None,
         
         Ypredicted[i] = np.dot(KsxK_inv, Ytraining)
         Yvar[i] = Kss - np.dot(KsxK_inv, Ks.T)
+        
+    if sequential_mode:
+        Xtraining = savedXtraining 
+        Ytraining = savedYtraining
         
     print("done")
     print("-"*50)
