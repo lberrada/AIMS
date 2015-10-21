@@ -68,4 +68,11 @@ def process_from_file(filename,
         training_df.plot()
         plt.show()
 
-    return training_df, testing_df
+    X = training_df.t.values
+    Y = training_df.y.values
+    Y -= np.mean(Y)
+    Xstar = testing_df.t.values
+    Ytruth = testing_df.ytruth.values
+    Ytruth -= np.mean(Ytruth)
+    
+    return X, Y, Xstar, Ytruth

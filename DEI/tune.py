@@ -9,8 +9,8 @@ import scipy.stats
 import scipy.optimize
 from kernels import gaussian_kernel, gaussian_kernel_2, locally_periodic_kernel
 
-def optimize_hyperparameters(X=None,
-                             Y=None,
+def optimize_hyperparameters(Xtraining=None,
+                             Ytraining=None,
                              use_kernel="gaussian"):
     
     print("optimizing hyper-parameters...")
@@ -42,16 +42,16 @@ def optimize_hyperparameters(X=None,
                                *args,
                                **kwargs):
         
-        K = kernel(X1=X[None, :],
-                   X2=X[:, None],
+        K = kernel(X1=Xtraining[None, :],
+                   X2=Xtraining[:, None],
                    params=params)
         
         L = np.linalg.cholesky(K)
-        aux_u = np.linalg.solve(L, Y)
+        aux_u = np.linalg.solve(L, Ytraining)
         u = np.linalg.solve(L.T, aux_u)
         log_det_K = 2 * np.trace(np.log(L))
         
-        log_likelihood = -0.5 * np.dot(Y.T, u) - 0.5 * log_det_K
+        log_likelihood = -0.5 * np.dot(Ytraining.T, u) - 0.5 * log_det_K
         
         
         neg_log_likelihood = -log_likelihood
