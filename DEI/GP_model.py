@@ -7,11 +7,9 @@ Date: 21 Oct 2015
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from kernels import gaussian_kernel, gaussian_kernel_2, locally_periodic_kernel, \
-    matern_kernel
 import copy
 import csv
-from means import nearest_neighbour_mean
+from build import mu_K
 sns.set(color_codes=True)
     
 
@@ -20,7 +18,8 @@ def predict(Xtraining=None,
             Xtesting=None,
             params=None,
             Ytestingtruth=None,
-            use_kernel="gaussian",
+            use_kernels=None,
+            use_means=None,
             sequential_mode=False,
             variable=None,
             estimator=None,
@@ -30,28 +29,16 @@ def predict(Xtraining=None,
     
     print("predicting data...")
     
-    if use_kernel == "gaussian":
-        kernel = gaussian_kernel
-        
-    elif use_kernel == "gaussian_2":
-        kernel = gaussian_kernel_2
-        
-    elif use_kernel == "locally_periodic":
-        kernel = locally_periodic_kernel
-        
-    elif use_kernel == "matern":
-        kernel = matern_kernel
-        
-    else:
-        raise ValueError("%s kernel not implemented:" % use_kernel)
-    
-    K = kernel(X1=Xtraining[None, :],
-               X2=Xtraining[:, None],
-               params=params)
+    mu, K = mu_K(use_kernels=use_kernels,
+                 use_means=use_means,
+                 X1=Xtraining[None, :],
+                 X2=Xtraining[:, None],
+                 Xtesting=Xtesting,
+                 params=params)
 
     L = np.linalg.cholesky(K)
 
-    Ypredicted = np.zeros_like(Xtesting)
+    Ypredicted = mu
     Yvar = np.zeros_like(Xtesting)
     index = 0
     
@@ -72,18 +59,22 @@ def predict(Xtraining=None,
             Ytraining = savedYtraining[:index]
         
         Xstar = xstar * np.ones_like(Xtraining)
-        Ks = kernel(X1=Xtraining,
-                    X2=Xstar,
-                    params=params)
-        
-        Kss = kernel(X1=xstar,
-                     X2=xstar,
+        _, Ks = mu_K(use_kernels=use_kernels,
+                     use_means=use_means,
+                     X1=Xtraining,
+                     X2=Xstar,
                      params=params)
+        
+        _, Kss = mu_K(use_kernels=use_kernels,
+                      use_means=use_means,
+                      X1=xstar,
+                      X2=xstar,
+                      params=params)
             
         aux = np.linalg.solve(L, Ks.T)
         KsxK_inv = np.linalg.solve(L.T, aux).T
         
-        Ypredicted[i] = np.dot(KsxK_inv, Ytraining) + ymean
+        Ypredicted[i] += np.dot(KsxK_inv, Ytraining) + mu
         Yvar[i] = Kss - np.dot(KsxK_inv, Ks.T)
         
     if sequential_mode:
@@ -100,7 +91,7 @@ def predict(Xtraining=None,
     r2 = 1 - ssres / sstot
     print(r2)
     
-    filename = use_kernel + "-" + estimator + "-" + variable + ".csv"
+    filename = use_kernels + "-" + use_means + "-" + estimator + "-" + variable + ".csv"
             
     with open(filename, 'a', newline='') as csvfile:
         my_writer = csv.writer(csvfile, delimiter='\t',

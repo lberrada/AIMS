@@ -61,63 +61,43 @@ def kernel(use_kernels,
     
 def get_kernel(kernel_name):
     
-    if kernel_name == "gaussian":
-        return gaussian_kernel
+    if kernel_name == "exponential_quadratic":
+        return exponential_quadratic_kernel
+    
+    if kernel_name == "rational_quadratic":
+        return rational_quadratic_kernel
             
-    if kernel_name == "gaussian_2":
-        return gaussian_kernel_2
-            
-    if kernel_name == "locally_periodic":
-        return locally_periodic_kernel
+    if kernel_name == "periodic":
+        return periodic_kernel
     
     if kernel_name == "matern":
         return matern_kernel
     
     raise ValueError("%s kernel not implemented:" % kernel_name)
 
-def gaussian_kernel(X1=None,
+def exponential_quadratic_kernel(X1=None,
+                                 X2=None,
+                                 params=None,
+                                 **kwargs):
+    
+    
+    sigma_f = params.pop(0)
+    scale = params.pop(0)
+    
+    D = X1 - X2
+    K = sigma_f ** 2 * np.exp(-np.power(D, 2) / (2 * scale ** 2))
+    
+    return K
+
+def periodic_kernel(X1=None,
                     X2=None,
                     params=None,
                     **kwargs):
     
-    
-    sigma_f = params.pop(0)
-    scale = params.pop(0)
-    
-    D = X1 - X2
-    K = sigma_f ** 2 * np.exp(-np.power(D, 2) / (2 * scale ** 2))
-    
-    return K
-
-def gaussian_kernel_2(X1=None,
-                      X2=None,
-                      params=None,
-                      **kwargs):
-    
-    K = gaussian_kernel(X1,
-                        X2,
-                        params)
-    
-    sigma_f_2 = params.pop(0)
-    scale_2 = params.pop(0)
-    
-    D = X1 - X2
-    K += sigma_f_2 ** 2 * np.exp(-np.power(D, 2) / (2 * scale_2 ** 2))
-    
-    return K
-
-def locally_periodic_kernel(X1=None,
-                            X2=None,
-                            params=None,
-                            **kwargs):
-    
-    sigma_f = params.pop(0)
-    scale = params.pop(0)
     nu = params.pop(0)
     
     D = X1 - X2
-    K = sigma_f ** 2 * np.exp(-np.power(D, 2) / (2 * scale ** 2))
-    K *= np.exp(-2 * np.power(np.sin(np.pi * nu * D), 2))
+    K = np.exp(-2 * np.power(np.sin(np.pi * nu * D), 2))
     
     return K
 
