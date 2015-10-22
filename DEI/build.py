@@ -18,6 +18,9 @@ def mu_K(use_kernels=None,
          params=None,
          **kwargs):
     
+    use_means = use_means.replace(" ", "")
+    use_kernels = use_kernels.replace(" ", "")
+    
     # ensure aux_params has the right data structure
     aux_params = copy.copy(params)
     aux_params = list(aux_params)

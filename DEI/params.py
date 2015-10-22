@@ -8,6 +8,9 @@ import copy
 def get_params(use_kernels=None,
                use_means=None):
     
+    use_means = use_means.replace(" ", "")
+    use_kernels = use_kernels.replace(" ", "")
+    
     zero_bound = 1e-6
     
     params = dict()
@@ -33,15 +36,15 @@ def get_params(use_kernels=None,
     aux_kernel_dict["exponential_quadratic_2"]["use_log"] = [True, True]
     
     aux_kernel_dict["periodic"] = dict()
-    aux_kernel_dict["periodic"]["names"] = ["p_nu"]
-    aux_kernel_dict["periodic"]["means"] = [200.]
+    aux_kernel_dict["periodic"]["names"] = ["p_period"]
+    aux_kernel_dict["periodic"]["means"] = [150.]
     aux_kernel_dict["periodic"]["stds"] = [30.]
     aux_kernel_dict["periodic"]["bounds"] = [(zero_bound, None)]
     aux_kernel_dict["periodic"]["use_log"] = [True]
     
     aux_kernel_dict["rational_quadratic"] = dict()
     aux_kernel_dict["rational_quadratic"]["names"] = ["rq_sigma_f", "rq_scale", "rq_nu"]
-    aux_kernel_dict["rational_quadratic"]["means"] = [1., 20., 0.5]
+    aux_kernel_dict["rational_quadratic"]["means"] = [1., 20., 2.]
     aux_kernel_dict["rational_quadratic"]["stds"] = [3, 10, 2]
     aux_kernel_dict["rational_quadratic"]["bounds"] = [(zero_bound, None), (zero_bound, None), (zero_bound, None)]
     aux_kernel_dict["rational_quadratic"]["use_log"] = [True, True, True]
@@ -71,7 +74,7 @@ def get_params(use_kernels=None,
     
     aux_mean_dict["periodic"] = dict()
     aux_mean_dict["periodic"] ["names"] = ["p_scale", "p_period"]
-    aux_mean_dict["periodic"] ["means"] = [1., 200.]
+    aux_mean_dict["periodic"] ["means"] = [1., 150.]
     aux_mean_dict["periodic"] ["stds"] = [3., 30]
     aux_mean_dict["periodic"]["bounds"] = [(zero_bound, None), (zero_bound, None)]
     aux_mean_dict["periodic"]["use_log"] = [True, True]

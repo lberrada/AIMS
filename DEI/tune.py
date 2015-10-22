@@ -40,7 +40,7 @@ def optimize_hyperparameters(Xtraining=None,
                      params=params)
         
         Ycentered = Ytraining - mu
-        
+
         L = np.linalg.cholesky(K)
         
         aux_u = np.linalg.solve(L, Ycentered)

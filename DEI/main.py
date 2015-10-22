@@ -56,9 +56,9 @@ sequential_mode = False
 #                 sequential_mode)
 
 
-variable ='temperature'
-use_kernels="rational_quadratic*periodic"
-use_means = "linear*periodic"
+variable ='tide'
+use_kernels="rational_quadratic + periodic"
+use_means = "constant"
 estimator = "MAP"
 
 run(filename=filename,

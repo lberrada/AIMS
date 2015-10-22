@@ -94,10 +94,12 @@ def periodic_kernel(X1=None,
                     params=None,
                     **kwargs):
     
-    nu = params.pop(0)
+    period = params.pop(0)
     
     D = X1 - X2
-    K = np.exp(-2 * np.power(np.sin(np.pi * nu * D), 2))
+    K = np.exp(-2 * np.power(np.sin(2 * np.pi * D / period), 2))
+    
+#     print('p', period, D[:5, :5], K[:5, :5])
     
     return K
 
@@ -112,6 +114,8 @@ def rational_quadratic_kernel(X1=None,
     
     D = X1 - X2
     K = sigma_f ** 2 * np.power(1. + 1. / (2.*nu) * np.power(D / scale, 2), -nu)
+    
+#     print('rq', scale, D[:5, :5], K[:5, :5])
     
     return K
     

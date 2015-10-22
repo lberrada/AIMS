@@ -88,6 +88,7 @@ def predict(Xtraining=None,
     print('computing score...')
     
     ssres = np.sum(np.power(Ypredicted - Ytestingtruth, 2))
+    print(np.sqrt(ssres))
     sstot = np.sum(np.power(Ypredicted - np.mean(Ypredicted), 2))
     r2 = 1 - ssres / sstot
     print(r2)
@@ -106,6 +107,7 @@ def predict(Xtraining=None,
     
     Ttesting = np.array([t0] * len(Xtesting), dtype='datetime64')
     Ttesting += np.array([np.timedelta64(int(x) * 5, 'm') for x in Xtesting], dtype=np.timedelta64)
+    Ttesting = Xtesting
     
     plt.errorbar(Ttesting,
                  Ypredicted,
