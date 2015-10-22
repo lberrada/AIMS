@@ -20,12 +20,12 @@ def optimize_hyperparameters(Xtraining=None,
     
     print("optimizing hyper-parameters...")
     
-    params = get_params(use_kernels, use_means)
+    my_params = get_params(use_kernels, use_means)
     
-    init_params = params["init"]
-    mean_params = params["means"]
-    mean_stds = params["stds"]
-    bounds = [(1e-6, None)] * len(params["init"])
+    init_params = my_params["init"]
+    mean_params = my_params["means"]
+    mean_stds = my_params["stds"]
+    bounds = [(1e-6, None)] * len(my_params["init"])
     
     def get_neg_log_likelihood(params,
                                *args,
@@ -41,6 +41,7 @@ def optimize_hyperparameters(Xtraining=None,
         Ycentered = Ytraining - mu
         
         L = np.linalg.cholesky(K)
+        
         aux_u = np.linalg.solve(L, Ycentered)
         u = np.linalg.solve(L.T, aux_u)
         log_det_K = 2 * np.trace(np.log(L))
@@ -86,11 +87,11 @@ def optimize_hyperparameters(Xtraining=None,
     
     print('done')
     print('Parameters found:')
-    for k in range(len(params["names"])):
-        print(params["names"][k] + " : " + str(params_found[k]))
+    for k in range(len(my_params["names"])):
+        print(my_params["names"][k] + " : " + str(params_found[k]))
     print('-' * 50)
     
-    filename = use_kernels + "-" + use_means + "-" + estimator + "-" + variable + ".csv"
+    filename = "./out/" + use_kernels + "-" + use_means + "-" + estimator + "-" + variable + ".csv"
             
     with open(filename, 'w', newline='') as csvfile:
         my_writer = csv.writer(csvfile, delimiter='\t',

@@ -18,8 +18,8 @@ def run(filename=None,
         estimator=None,
         sequential_mode=None):
 
-    Xtraining, Ytraining, Xtesting, Ytestingtruth, t0, ymean = process_from_file(filename,
-                                                                                 variable=variable)
+    Xtraining, Ytraining, Xtesting, Ytestingtruth, t0 = process_from_file(filename,
+                                                                          variable=variable)
     
     params = optimize_hyperparameters(Xtraining,
                                       Ytraining,
@@ -39,7 +39,6 @@ def run(filename=None,
             estimator=estimator,
             variable=variable,
             t0=t0,
-            ymean=ymean,
             show_plot=False)
     
 
@@ -58,9 +57,9 @@ sequential_mode = False
 
 
 variable ='temperature'
-use_kernels="exponential_quadratic"
-use_means = "constant"
-estimator = "MLE"
+use_kernels="rational_quadratic*periodic"
+use_means = "linear*periodic"
+estimator = "MAP"
 
 run(filename=filename,
     variable=variable,

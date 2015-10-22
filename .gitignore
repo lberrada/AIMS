@@ -64,5 +64,4 @@ target/
 .DS_Store
 
 #Figures and data generated in DEI
-DEI/*.png
-DEI/*.csv
+DEI/out

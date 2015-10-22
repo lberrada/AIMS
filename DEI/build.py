@@ -25,15 +25,15 @@ def mu_K(use_kernels=None,
     # parse string
     temp_str = use_kernels.replace("*", "+")
     all_kernels = temp_str.split("+")
-    
-    use_kernels.replace(all_kernels[0], '')
+
+    use_kernels = use_kernels[len(all_kernels[0]):]
     K = get_kernel(all_kernels.pop(0))(X1=X1,
                                        X2=X2,
                                        params=params)
-    
+
     while len(all_kernels):
-        op = use_kernels.pop(0)
-        use_kernels.replace(all_kernels[0], "")
+        op = use_kernels[0]
+        use_kernels = use_kernels[len(all_kernels[0]) + 1:]
         if op == "+":
             K += get_kernel(all_kernels.pop(0))(X1=X1,
                                                 X2=X2,
@@ -44,7 +44,7 @@ def mu_K(use_kernels=None,
                                                 X2=X2,
                                                 params=params)
         else:
-            raise ValueError("shit happened")
+            raise ValueError("shit happened : %s" % op)
         
     if len(K.shape) == 2:
         n = len(K)
@@ -63,13 +63,13 @@ def mu_K(use_kernels=None,
     temp_str = use_means.replace("*", "+")
     all_means = temp_str.split("+")
     
-    use_means.replace(all_means[0], '')
+    use_means = use_means[len(all_means[0]):]
     mu = get_mean(all_means.pop(0))(Xtesting=Xtesting,
                                     params=params)
     
     while len(all_kernels):
-        op = use_means.pop(0)
-        use_means.replace(all_means[0], "")
+        op = use_means[0]
+        use_means = use_means[len(all_means[0]) + 1:]
         if op == "+":
             mu += get_mean(all_means.pop(0))(Xtesting=Xtesting,
                                              params=params)
@@ -78,6 +78,6 @@ def mu_K(use_kernels=None,
             mu *= get_mean(all_means.pop(0))(Xtesting=Xtesting,
                                              params=params)
         else:
-            raise ValueError("shit happened")
+            raise ValueError("shit happened : %s" % op)
         
     return mu, K

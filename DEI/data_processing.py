@@ -71,10 +71,8 @@ def process_from_file(filename,
 
     X = training_df.t.values
     Y = training_df.y.values
-    ymean = np.mean(Y)
-    Y -= ymean
     Xstar = testing_df.t.values
     Ytruth = testing_df.ytruth.values
     t0 = np.datetime64(t0)
     
-    return X, Y, Xstar, Ytruth, t0, ymean
+    return X, Y, Xstar, Ytruth, t0

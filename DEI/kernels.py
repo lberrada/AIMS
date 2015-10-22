@@ -61,16 +61,16 @@ def kernel(use_kernels,
     
 def get_kernel(kernel_name):
     
-    if kernel_name == "exponential_quadratic":
+    if "exponential_quadratic" in kernel_name:
         return exponential_quadratic_kernel
     
-    if kernel_name == "rational_quadratic":
+    if "rational_quadratic" in kernel_name:
         return rational_quadratic_kernel
             
-    if kernel_name == "periodic":
+    if "periodic" in kernel_name:
         return periodic_kernel
     
-    if kernel_name == "matern":
+    if "matern" in kernel_name:
         return matern_kernel
     
     raise ValueError("%s kernel not implemented:" % kernel_name)

@@ -24,7 +24,6 @@ def predict(Xtraining=None,
             variable=None,
             estimator=None,
             t0=None,
-            ymean=None,
             show_plot=True):
     
     print("predicting data...")
@@ -93,7 +92,7 @@ def predict(Xtraining=None,
     r2 = 1 - ssres / sstot
     print(r2)
     
-    filename = use_kernels + "-" + use_means + "-" + estimator + "-" + variable + ".csv"
+    filename = "./out/" + use_kernels + "-" + use_means + "-" + estimator + "-" + variable + ".csv"
             
     with open(filename, 'a', newline='') as csvfile:
         my_writer = csv.writer(csvfile, delimiter='\t',
