@@ -66,15 +66,17 @@ def get_params(use_kernels=None,
     
     for k_name in all_kernels:
         params["names"] += aux_kernel_dict[k_name]["names"]
-        params["means"] += aux_kernel_dict[k_name]["names"]
-        params["stds"] += aux_kernel_dict[k_name]["names"]
-        params["init"] += aux_kernel_dict[k_name]["names"]
+        params["means"] += aux_kernel_dict[k_name]["means"]
+        params["stds"] += aux_kernel_dict[k_name]["stds"]
+        params["init"] += aux_kernel_dict[k_name]["init"]
         
     for m_name in all_means:
         params["names"] += aux_mean_dict[m_name]["names"]
-        params["means"] += aux_mean_dict[m_name]["names"]
-        params["stds"] += aux_mean_dict[m_name]["names"]
-        params["init"] += aux_mean_dict[m_name]["names"]
+        params["means"] += aux_mean_dict[m_name]["means"]
+        params["stds"] += aux_mean_dict[m_name]["stds"]
+        params["init"] += aux_mean_dict[m_name]["init"]
+        
+    return params
         
         
         

@@ -56,7 +56,7 @@ def mu_K(use_kernels=None,
         
     mu = 0
     
-    if Xtesting == None:
+    if not hasattr(Xtesting, "__len__") and Xtesting == None:
         return mu, K  
         
         

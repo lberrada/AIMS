@@ -9,6 +9,7 @@ import scipy.stats
 import scipy.optimize
 import csv
 from build import mu_K
+from params import get_params
 
 def optimize_hyperparameters(Xtraining=None,
                              Ytraining=None,

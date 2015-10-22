@@ -33,19 +33,20 @@ def predict(Xtraining=None,
                  use_means=use_means,
                  X1=Xtraining[None, :],
                  X2=Xtraining[:, None],
-                 Xtesting=Xtesting,
+                 Xtesting=Xtraining,
                  params=params)
-
+    
     L = np.linalg.cholesky(K)
 
-    Ypredicted = mu
+    Ypredicted = np.zeros_like(Xtesting)
     Yvar = np.zeros_like(Xtesting)
+    Y_centered = Ytraining - mu
     index = 0
     
     if sequential_mode:
         training_len = len(Xtraining)
         savedXtraining = copy.copy(Xtraining)
-        savedYtraining = copy.copy(Ytraining)
+        savedYtraining = copy.copy(Y_centered)
     
     for i in range(1, len(Xtesting)):
         
@@ -56,7 +57,7 @@ def predict(Xtraining=None,
                 index += 1
             L = np.linalg.cholesky(K[:index, :index])
             Xtraining = savedXtraining[:index]
-            Ytraining = savedYtraining[:index]
+            Y_centered = savedYtraining[:index]
         
         Xstar = xstar * np.ones_like(Xtraining)
         _, Ks = mu_K(use_kernels=use_kernels,
@@ -65,16 +66,17 @@ def predict(Xtraining=None,
                      X2=Xstar,
                      params=params)
         
-        _, Kss = mu_K(use_kernels=use_kernels,
+        mu, Kss = mu_K(use_kernels=use_kernels,
                       use_means=use_means,
                       X1=xstar,
                       X2=xstar,
+                      Xtesting=xstar,
                       params=params)
             
         aux = np.linalg.solve(L, Ks.T)
         KsxK_inv = np.linalg.solve(L.T, aux).T
         
-        Ypredicted[i] += np.dot(KsxK_inv, Ytraining) + mu
+        Ypredicted[i] = np.dot(KsxK_inv, Y_centered) + mu
         Yvar[i] = Kss - np.dot(KsxK_inv, Ks.T)
         
     if sequential_mode:
