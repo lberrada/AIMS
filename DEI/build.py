@@ -8,6 +8,7 @@ import numpy as np
 
 from kernels import get_kernel
 from means import get_mean
+import copy
 
 def mu_K(use_kernels=None,
          use_means=None,
@@ -17,10 +18,11 @@ def mu_K(use_kernels=None,
          params=None,
          **kwargs):
     
-    # ensure params has the right data structure
-    params = list(params)
+    # ensure aux_params has the right data structure
+    aux_params = copy.copy(params)
+    aux_params = list(aux_params)
     
-    sigma_n = params.pop(0)
+    sigma_n = aux_params.pop(0)
     
     # parse string
     temp_str = use_kernels.replace("*", "+")
@@ -29,7 +31,7 @@ def mu_K(use_kernels=None,
     use_kernels = use_kernels[len(all_kernels[0]):]
     K = get_kernel(all_kernels.pop(0))(X1=X1,
                                        X2=X2,
-                                       params=params)
+                                       params=aux_params)
 
     while len(all_kernels):
         op = use_kernels[0]
@@ -37,12 +39,12 @@ def mu_K(use_kernels=None,
         if op == "+":
             K += get_kernel(all_kernels.pop(0))(X1=X1,
                                                 X2=X2,
-                                                params=params)
+                                                params=aux_params)
         
         elif op == "*":
             K *= get_kernel(all_kernels.pop(0))(X1=X1,
                                                 X2=X2,
-                                                params=params)
+                                                params=aux_params)
         else:
             raise ValueError("shit happened : %s" % op)
         
@@ -65,18 +67,18 @@ def mu_K(use_kernels=None,
     
     use_means = use_means[len(all_means[0]):]
     mu = get_mean(all_means.pop(0))(Xtesting=Xtesting,
-                                    params=params)
+                                    params=aux_params)
     
     while len(all_kernels):
         op = use_means[0]
         use_means = use_means[len(all_means[0]) + 1:]
         if op == "+":
             mu += get_mean(all_means.pop(0))(Xtesting=Xtesting,
-                                             params=params)
+                                             params=aux_params)
         
         elif op == "*":
             mu *= get_mean(all_means.pop(0))(Xtesting=Xtesting,
-                                             params=params)
+                                             params=aux_params)
         else:
             raise ValueError("shit happened : %s" % op)
         

@@ -22,10 +22,11 @@ def optimize_hyperparameters(Xtraining=None,
     
     my_params = get_params(use_kernels, use_means)
     
-    init_params = my_params["init"]
+    init_params = np.array(my_params["init"])
     mean_params = my_params["means"]
     mean_stds = my_params["stds"]
-    bounds = [(1e-6, None)] * len(my_params["init"])
+    bounds = my_params["bounds"]
+    use_log = my_params["use_log"]
     
     def get_neg_log_likelihood(params,
                                *args,
@@ -48,7 +49,6 @@ def optimize_hyperparameters(Xtraining=None,
         
         log_likelihood = -0.5 * np.dot(Ycentered.T, u) - 0.5 * log_det_K
         
-        
         neg_log_likelihood = -log_likelihood
         
         return neg_log_likelihood
@@ -59,9 +59,20 @@ def optimize_hyperparameters(Xtraining=None,
                               **kwargs):
         
         log_likelihood = -np.array(get_neg_log_likelihood(params))
-        log_prior = np.sum(scipy.stats.norm.logpdf(np.log(params),
-                                                   loc=np.log(mean_params),
-                                                   scale=mean_stds)) - np.sum(np.log(params))
+
+        log_prior = 0
+        for i in range(len(params)):
+            if use_log[i]:
+                x = np.log(params[i])
+                mu = np.log(mean_params[i])
+                log_prior -= x
+            else:
+                x = params[i]
+                mu = mean_params[i]
+            
+            log_prior+=scipy.stats.norm.logpdf(x,
+                                               loc=mu,
+                                               scale=mean_stds[i])
         
         log_posterior = log_likelihood + log_prior
         
