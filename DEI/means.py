@@ -6,23 +6,37 @@ Date: 22 Oct 2015
 
 import numpy as np
 
-def constant_mean(Xtraining,
-                  Ytraining,
-                  x):
+def get_mean(mean_name):
     
-    return np.mean(Ytraining)
+    if mean_name=="constant":
+        return constant_mean
+    
+    if mean_name=="linear":
+        return linear_mean
+    
+    if mean_name=="periodic":
+        return periodic_mean
+    
+    raise ValueError("%s mean function not implemented" % mean_name)
 
-def nearest_neighbour_mean(Xtraining,
-                           Ytraining,
-                           x,
-                           k=6):
+def constant_mean(alpha,
+                  Xtesting):
     
-    i = k // 2
-    stop = i
-    while stop < len(Xtraining) and Xtraining[stop - i] < x:
-        stop += 1
+    if not hasattr(Xtesting, "__len__"):
+        return alpha
     
-    start = max(0, stop - k)
-    ymean = np.mean(Ytraining[start:stop])
+    return alpha * np.ones_like(Xtesting)
+
+def linear_mean(alpha,
+                beta,
+                Xtest):
     
-    return ymean
+    return alpha * Xtest + beta
+
+def periodic_mean(scale,
+                  period,
+                  Xtest):
+    
+    return scale * np.sin(2.*np.pi * Xtest / period)
+    
+    

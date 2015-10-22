@@ -9,67 +9,22 @@ import scipy.stats
 import scipy.optimize
 import csv
 from kernels import gaussian_kernel, gaussian_kernel_2, locally_periodic_kernel,\
-    matern_kernel
+    matern_kernel, get_kernel
+from means import get_mean
 
 def optimize_hyperparameters(Xtraining=None,
                              Ytraining=None,
                              use_kernel="gaussian",
                              estimator="MAP",
-                             variable=None):
+                             variable=None,
+                             use_mean="constant"):
     
     print("optimizing hyper-parameters...")
     
-    if use_kernel == "gaussian":
-        kernel = gaussian_kernel
-        if variable == "temperature":
-            mean_params = np.array([1., 1., 10.])
-            sigma_params = np.array([10., 10., 10.])
-            init_theta = np.array([1., 0.5, 25])
-        
-        elif variable=="tide":
-            mean_params = np.array([1., 1., 10.])
-            sigma_params = np.array([10., 10., 10.])
-            init_theta = np.array([1., 0.5, 25])
-            
-    elif use_kernel == "gaussian_2":
-        kernel = gaussian_kernel_2
-        if variable == "temperature":
-            mean_params = np.array([1., 1., 10., 0.1, 248.])
-            sigma_params = np.array([10., 10., 10., 10., 10.])
-            init_theta = np.array([1., 0.5, 25, 1., 250.])
-            
-        elif variable=="tide":
-            mean_params = np.array([1., 1., 10., 0.1, 100.])
-            sigma_params = np.array([10., 10., 10., 10., 20.])
-            init_theta = np.array([1., 0.5, 25, 1., 100.])
-        
-    elif use_kernel == "locally_periodic":
-        kernel = locally_periodic_kernel
-        if variable == "temperature":
-            mean_params = np.array([1., 1., 10., 1.])
-            sigma_params = np.array([10., 10., 10., 10.])
-            init_theta = np.array([1., 0.5, 25, 2.])
-            
-        elif variable=="tide":
-            mean_params = np.array([1., 1., 10., 2])
-            sigma_params = np.array([10., 10., 10., 10.])
-            init_theta = np.array([1., 0.5, 25, 2.])
+    kernel = get_kernel(use_kernel)
+    mean = get_mean(use_mean)
+    params = get_params(use_kernel, use_mean)
     
-    elif use_kernel == "matern":
-        kernel = matern_kernel
-        if variable == "temperature":
-            mean_params = np.array([1., 1., 10., 3])
-            sigma_params = np.array([10., 10., 10., 1.])
-            init_theta = np.array([1., 0.5, 25, 3.])
-        
-        elif variable=="tide":
-            mean_params = np.array([1., 1., 10., 3.])
-            sigma_params = np.array([10., 10., 10., 1.])
-            init_theta = np.array([1., 0.5, 25, 3.])
-    
-    else:
-        raise ValueError("%s kernel not implemented:" % use_kernel)
-        
     bounds = [(1e-6, None)] * len(init_theta)
     
     def get_neg_log_likelihood(params,
