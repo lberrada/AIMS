@@ -107,7 +107,7 @@ def predict(Xtraining=None,
     
     Ttesting = np.array([t0] * len(Xtesting), dtype='datetime64')
     Ttesting += np.array([np.timedelta64(int(x) * 5, 'm') for x in Xtesting], dtype=np.timedelta64)
-    Ttesting = Xtesting
+#     Ttesting = Xtesting
     
     plt.errorbar(Ttesting,
                  Ypredicted,
