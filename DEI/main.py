@@ -11,6 +11,7 @@ from GP_model import predict
 from tune import optimize_hyperparameters
 from utils import timeit
 import csv
+from argparse import ArgumentParser
 
 @timeit
 def run(filename=None,
@@ -47,50 +48,8 @@ def run(filename=None,
 #             show_plot=False)
     
 
-filename = 'sotonmet.txt'
-variable = 'temperature'
-use_kernels = "matern_12 + periodic"
-use_means = "constant"
-estimator = "MAP"
-sequential_mode = False
-
-for estimator in ["MLE", "MAP"]:
-    for variable in ["tide", "temperature"]:
-        for op in ["+", "*"]:
-            for use_kernels in ["exponential_quadratic" + op + "exponential_quadratic_2", 
-                                "exponential_quadratic" + op + "periodic", 
-                                "rational_quadratic" + op + "periodic",
-                                "matern_12" + op + "periodic",
-                                "matern_32" + op + "periodic"]:
-                for use_means in ["constant", "constant + periodic"]:
-                    try:
-                        run(filename=filename,
-                            variable=variable,
-                            use_kernels=use_kernels,
-                            estimator=estimator,
-                            use_means=use_means,
-                            sequential_mode=sequential_mode)
-                    except:
-                        print("damn")
-                        with open("./out/results.csv", 'a', newline='') as csvfile:
-                            my_writer = csv.writer(csvfile, delimiter='\t',
-                                                   quoting=csv.QUOTE_MINIMAL)
-                            my_writer.writerow(["shit happened with following parameters:", 
-                                                 variable,
-                                                 use_kernels,
-                                                 use_means,
-                                                 estimator])
 
 
-
-
-# run(filename=filename,
-#     variable=variable,
-#     use_kernels=use_kernels,
-#     estimator=estimator,
-#     use_means=use_means,
-#     sequential_mode=sequential_mode)
-        
 
 
 
