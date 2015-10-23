@@ -24,7 +24,8 @@ def predict(Xtraining=None,
             variable=None,
             estimator=None,
             t0=None,
-            show_plot=True):
+            show_plot=True,
+            validation=False):
     
     print("predicting data...")
     
@@ -92,6 +93,13 @@ def predict(Xtraining=None,
     sstot = np.sum(np.power(Ypredicted - np.mean(Ypredicted), 2))
     r2 = 1 - ssres / sstot
     print(r2)
+    print("done")
+    print("-"*50)
+    
+    if validation:
+        return r2
+    
+    print("creating plot...")
     
     filename = "./out/" + use_kernels + "-" + use_means + "-" + estimator + "-" + variable + ".csv"
             
@@ -100,10 +108,7 @@ def predict(Xtraining=None,
                                quoting=csv.QUOTE_MINIMAL)
         my_writer.writerow([round(r2, 3)])
 
-    print("done")
-    print("-"*50)
     
-    print("creating plot...")
     
     Ttesting = np.array([t0] * len(Xtesting), dtype='datetime64')
     Ttesting += np.array([np.timedelta64(int(x) * 5, 'm') for x in Xtesting], dtype=np.timedelta64)

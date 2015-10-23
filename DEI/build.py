@@ -50,14 +50,15 @@ def mu_K(use_kernels=None,
                                                 params=aux_params)
         else:
             raise ValueError("shit happened : %s" % op)
-        
-    if len(K.shape) == 2:
+    
+    if not hasattr(K, "__len__"):
+        K += sigma_n ** 2
+         
+    elif len(K.shape) == 2 and K.shape[0] == K.shape[1]:
         n = len(K)
         same_x = [np.arange(n), np.arange(n)]
         K[same_x] += sigma_n ** 2
         
-    elif not hasattr(K, "__len__"):
-        K += sigma_n ** 2
         
     mu = 0
     

@@ -10,6 +10,7 @@ import scipy.optimize
 import csv
 from build import mu_K
 from params import get_params
+from GP_model import predict
 
 def optimize_hyperparameters(Xtraining=None,
                              Ytraining=None,
@@ -28,26 +29,37 @@ def optimize_hyperparameters(Xtraining=None,
     bounds = my_params["bounds"]
     use_log = my_params["use_log"]
     
+    n_validation = int(0.3 * len(Xtraining))
+    validation_indices = np.random.choice(range(len(Xtraining)),
+                                          size=n_validation,
+                                          replace=False)
+    training_indices = [i for i in range(len(Xtraining)) if i not in validation_indices]
+    
+    XXtraining = Xtraining[training_indices]
+    XXvalidation = Xtraining[validation_indices]
+    YYtraining = Ytraining[training_indices]
+    YYvalidation = Ytraining[validation_indices]
+    
     def get_neg_log_likelihood(params,
                                *args,
                                **kwargs):
         
         mu, K = mu_K(use_means=use_means,
                      use_kernels=use_kernels,
-                     X1=Xtraining[None, :],
-                     X2=Xtraining[:, None],
-                     Xtesting=Xtraining,
+                     X1=XXtraining[None, :],
+                     X2=XXtraining[:, None],
+                     Xtesting=XXtraining,
                      params=params)
         
-        Ycentered = Ytraining - mu
+        Ycentered = YYtraining - mu
 
         L = np.linalg.cholesky(K)
-        
-        aux_u = np.linalg.solve(L, Ycentered)
-        u = np.linalg.solve(L.T, aux_u)
         log_det_K = 2 * np.trace(np.log(L))
         
-        log_likelihood = -0.5 * np.dot(Ycentered.T, u) - 0.5 * log_det_K
+        aux = np.linalg.solve(L, Ycentered.T)
+        YcenteredTxK_inv = np.linalg.solve(L.T, aux).T
+        
+        log_likelihood = -0.5 * np.dot(YcenteredTxK_inv, Ycentered) - 0.5 * log_det_K
         
         neg_log_likelihood = -log_likelihood
         
@@ -70,7 +82,7 @@ def optimize_hyperparameters(Xtraining=None,
                 x = params[i]
                 mu = mean_params[i]
             
-            log_prior+=scipy.stats.norm.logpdf(x,
+            log_prior += scipy.stats.norm.logpdf(x,
                                                loc=mu,
                                                scale=mean_stds[i])
         
@@ -96,10 +108,25 @@ def optimize_hyperparameters(Xtraining=None,
     
     params_found = theta[0]
     
+    r2 = predict(Xtraining=XXtraining,
+                 Ytraining=YYtraining,
+                 Xtesting=XXvalidation,
+                 Ytestingtruth=YYvalidation,
+                 params=params_found,
+                 use_kernels=use_kernels,
+                 use_means=use_means,
+                 sequential_mode=False,
+                 variable=variable,
+                 estimator=estimator,
+                 show_plot=False,
+                 validation=True)
+    
     print('done')
     print('Parameters found:')
     for k in range(len(my_params["names"])):
         print(my_params["names"][k] + " : " + str(params_found[k]))
+    print('-' * 50)
+    print("R2 score : " + str(r2))
     print('-' * 50)
     
     filename = "./out/" + use_kernels + "-" + use_means + "-" + estimator + "-" + variable + ".csv"
@@ -108,5 +135,6 @@ def optimize_hyperparameters(Xtraining=None,
         my_writer = csv.writer(csvfile, delimiter='\t',
                                quoting=csv.QUOTE_MINIMAL)
         my_writer.writerow(list(np.round(params_found, 3)))
+        my_writer.writerow([r2])
     
     return params_found.tolist()
