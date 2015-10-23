@@ -10,7 +10,6 @@ import scipy.optimize
 import csv
 from build import mu_K
 from params import get_params
-from GP_model import predict
 
 def optimize_hyperparameters(Xtraining=None,
                              Ytraining=None,
@@ -29,29 +28,18 @@ def optimize_hyperparameters(Xtraining=None,
     bounds = my_params["bounds"]
     use_log = my_params["use_log"]
     
-    n_validation = int(0.3 * len(Xtraining))
-    validation_indices = np.random.choice(range(len(Xtraining)),
-                                          size=n_validation,
-                                          replace=False)
-    training_indices = [i for i in range(len(Xtraining)) if i not in validation_indices]
-    
-    XXtraining = Xtraining[training_indices]
-    XXvalidation = Xtraining[validation_indices]
-    YYtraining = Ytraining[training_indices]
-    YYvalidation = Ytraining[validation_indices]
-    
     def get_neg_log_likelihood(params,
                                *args,
                                **kwargs):
         
         mu, K = mu_K(use_means=use_means,
                      use_kernels=use_kernels,
-                     X1=XXtraining[None, :],
-                     X2=XXtraining[:, None],
-                     Xtesting=XXtraining,
+                     X1=Xtraining[None, :],
+                     X2=Xtraining[:, None],
+                     Xtesting=Xtraining,
                      params=params)
         
-        Ycentered = YYtraining - mu
+        Ycentered = Ytraining - mu
 
         L = np.linalg.cholesky(K)
         log_det_K = 2 * np.trace(np.log(L))
@@ -107,34 +95,28 @@ def optimize_hyperparameters(Xtraining=None,
                                          bounds=bounds)
     
     params_found = theta[0]
-    
-    r2 = predict(Xtraining=XXtraining,
-                 Ytraining=YYtraining,
-                 Xtesting=XXvalidation,
-                 Ytestingtruth=YYvalidation,
-                 params=params_found,
-                 use_kernels=use_kernels,
-                 use_means=use_means,
-                 sequential_mode=False,
-                 variable=variable,
-                 estimator=estimator,
-                 show_plot=False,
-                 validation=True)
+    if estimator == "MLE":
+        score = get_neg_log_likelihood(params_found)
+    else:
+        score = get_neg_log_posterior(params_found)
     
     print('done')
     print('Parameters found:')
     for k in range(len(my_params["names"])):
         print(my_params["names"][k] + " : " + str(params_found[k]))
-    print('-' * 50)
-    print("R2 score : " + str(r2))
+    print("Score found : " + str(score))
     print('-' * 50)
     
-    filename = "./out/" + use_kernels + "-" + use_means + "-" + estimator + "-" + variable + ".csv"
+#     filename = "./out/" + use_kernels + "-" + use_means + "-" + estimator + "-" + variable + ".csv"
+    filename = "./out/results.csv"
             
-    with open(filename, 'w', newline='') as csvfile:
+#     with open(filename, 'w', newline='') as csvfile:
+    with open(filename, 'a', newline='') as csvfile:
         my_writer = csv.writer(csvfile, delimiter='\t',
                                quoting=csv.QUOTE_MINIMAL)
-        my_writer.writerow(list(np.round(params_found, 3)))
-        my_writer.writerow([r2])
+        my_writer.writerow([use_kernels, use_means, variable, estimator])
+        my_writer.writerow(list(my_params["names"]))
+        my_writer.writerow(list(np.round(params_found, 4)))
+        my_writer.writerow([estimator, score])
     
     return params_found.tolist()

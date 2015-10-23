@@ -48,11 +48,13 @@ def predict(Xtraining=None,
         savedXtraining = copy.copy(Xtraining)
         savedYtraining = copy.copy(Y_centered)
     
-    for i in range(1, len(Xtesting)):
+    for i in range(len(Xtesting)):
         
         xstar = Xtesting[i]
         
         if sequential_mode:
+            if i==0:
+                continue
             while index < training_len and savedXtraining[index] < xstar:
                 index += 1
             L = np.linalg.cholesky(K[:index, :index])
@@ -101,27 +103,39 @@ def predict(Xtraining=None,
     
     print("creating plot...")
     
-    filename = "./out/" + use_kernels + "-" + use_means + "-" + estimator + "-" + variable + ".csv"
+#     filename = "./out/" + use_kernels + "-" + use_means + "-" + estimator + "-" + variable + ".csv"
+    filename = "./out/results.csv"
             
     with open(filename, 'a', newline='') as csvfile:
         my_writer = csv.writer(csvfile, delimiter='\t',
                                quoting=csv.QUOTE_MINIMAL)
-        my_writer.writerow([round(r2, 3)])
+        my_writer.writerow(['r2', round(r2, 3)])
 
     
     
     Ttesting = np.array([t0] * len(Xtesting), dtype='datetime64')
     Ttesting += np.array([np.timedelta64(int(x) * 5, 'm') for x in Xtesting], dtype=np.timedelta64)
-#     Ttesting = Xtesting
     
-    plt.errorbar(Ttesting,
-                 Ypredicted,
-                 fmt='o',
-                 ms=4,
-                 color='red',
-                 ecolor='red',
-                 yerr=1.96 * np.sqrt(Yvar),
-                 alpha=0.3)
+#     plt.errorbar(Ttesting,
+#                  Ypredicted,
+#                  fmt='o',
+#                  ms=4,
+#                  color='red',
+#                  ecolor='red',
+#                  yerr=1.96 * np.sqrt(Yvar),
+#                  alpha=0.3)
+    
+    plt.fill_between(Ttesting,
+                     Ypredicted - 1.96 * np.sqrt(Yvar),
+                     Ypredicted + 1.96 * np.sqrt(Yvar),
+                     color='red',
+                     alpha=0.3)
+    
+    plt.fill_between(Ttesting,
+                     Ypredicted - np.sqrt(Yvar),
+                     Ypredicted + np.sqrt(Yvar),
+                     color='red',
+                     alpha=0.3)
     
     plt.plot(Ttesting,
              Ytestingtruth,

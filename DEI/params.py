@@ -49,12 +49,8 @@ def get_params(use_kernels=None,
     aux_kernel_dict["rational_quadratic"]["bounds"] = [(zero_bound, None), (zero_bound, None), (zero_bound, None)]
     aux_kernel_dict["rational_quadratic"]["use_log"] = [True, True, True]
     
-    aux_kernel_dict["matern"] = dict()
-    aux_kernel_dict["matern"]["names"] = ["m_sigma_f", "m_scale", "m_nu"]
-    aux_kernel_dict["matern"]["means"] = [1., 20., 0.5]
-    aux_kernel_dict["matern"]["stds"] = [3, 10, 2]
-    aux_kernel_dict["matern"]["bounds"] = [(zero_bound, None), (zero_bound, None), (zero_bound, None)]
-    aux_kernel_dict["matern"]["use_log"] = [True, True, True]
+    aux_kernel_dict["matern_12"] = aux_kernel_dict["exponential_quadratic"]
+    aux_kernel_dict["matern_32"] = aux_kernel_dict["exponential_quadratic"]
     
     
     aux_mean_dict = dict()

@@ -7,7 +7,6 @@ Date: 19 Oct 2015
 """
 
 import numpy as np
-import scipy.special
 
 def kernel(use_kernels,
            X1=None,
@@ -70,8 +69,11 @@ def get_kernel(kernel_name):
     if "periodic" in kernel_name:
         return periodic_kernel
     
-    if "matern" in kernel_name:
-        return matern_kernel
+    if "matern_12" in kernel_name:
+        return matern_12_kernel
+    
+    if "matern_32" in kernel_name:
+        return matern_32_kernel
     
     raise ValueError("%s kernel not implemented:" % kernel_name)
 
@@ -119,24 +121,31 @@ def rational_quadratic_kernel(X1=None,
     
     return K
     
-def matern_kernel(X1=None,
-                  X2=None,
-                  params=None,
-                  **kwargs):
+def matern_12_kernel(X1=None,
+                     X2=None,
+                     params=None,
+                     **kwargs):
     
     sigma_f = params.pop(0)
     scale = params.pop(0)
-    nu = params.pop(0)
     
     D = np.abs(X1 - X2)
     
-    auxx = 2 * np.sqrt(nu) * D / scale
+    K = sigma_f ** 2 * np.exp(-D / scale)
     
-    aux1 = (1. / (scipy.special.gamma(D) * 2 ** (nu - 1)))
-    aux2 = np.power(auxx, nu)
-    aux3 = scipy.special.kv(nu, auxx + 1e-6)
+    return K
+
+def matern_32_kernel(X1=None,
+                     X2=None,
+                     params=None,
+                     **kwargs):
     
-    K = sigma_f ** 2 * aux1 * aux2 * aux3
+    sigma_f = params.pop(0)
+    scale = params.pop(0)
+    
+    D = np.abs(X1 - X2)
+    
+    K = sigma_f ** 2 * (1. + np.sqrt(3) * D / scale) * np.exp(-np.sqrt(3) * D / scale)
     
     return K
     
