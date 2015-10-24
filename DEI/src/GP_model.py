@@ -103,15 +103,15 @@ def predict(Xtraining=None,
     
     print("creating plot...")
     
-#     filename = "./out/" + use_kernels + "-" + use_means + "-" + estimator + "-" + variable + ".csv"
-    filename = "./out/results.csv"
+#     filename = "../out/" + use_kernels + "-" + use_means + "-" + estimator + "-" + variable + ".csv"
+    filename = "../out/results.csv"
             
     with open(filename, 'a', newline='') as csvfile:
         my_writer = csv.writer(csvfile, delimiter='\t',
                                quoting=csv.QUOTE_MINIMAL)
         my_writer.writerow(['r2', round(r2, 3)])
 
-    filename = "./out/best.png"
+    filename = "../out/best.png"
     
     Ttesting = np.array([t0] * len(Xtesting), dtype='datetime64')
     Ttesting += np.array([np.timedelta64(int(x) * 5, 'm') for x in Xtesting], dtype=np.timedelta64)

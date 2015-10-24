@@ -31,7 +31,7 @@ for op in ["+", "*"]:
                     sequential_mode=sequential_mode)
             except:
                 print("damn")
-                with open("./out/results_v3-3.csv", 'a', newline='') as csvfile:
+                with open("../out/results_v3-3.csv", 'a', newline='') as csvfile:
                     my_writer = csv.writer(csvfile, delimiter='\t',
                                            quoting=csv.QUOTE_MINIMAL)
                     my_writer.writerow(["shit happened with following parameters:", 
