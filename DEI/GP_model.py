@@ -111,7 +111,7 @@ def predict(Xtraining=None,
                                quoting=csv.QUOTE_MINIMAL)
         my_writer.writerow(['r2', round(r2, 3)])
 
-    
+    filename = "./out/" + use_kernels + "-" + use_means + "-" + estimator + "-" + variable + ".csv"
     
     Ttesting = np.array([t0] * len(Xtesting), dtype='datetime64')
     Ttesting += np.array([np.timedelta64(int(x) * 5, 'm') for x in Xtesting], dtype=np.timedelta64)

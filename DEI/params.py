@@ -36,11 +36,11 @@ def get_params(use_kernels=None,
     aux_kernel_dict["exponential_quadratic_2"]["use_log"] = [True, True]
     
     aux_kernel_dict["periodic"] = dict()
-    aux_kernel_dict["periodic"]["names"] = ["p_period"]
-    aux_kernel_dict["periodic"]["means"] = [150.]
-    aux_kernel_dict["periodic"]["stds"] = [30.]
-    aux_kernel_dict["periodic"]["bounds"] = [(zero_bound, None)]
-    aux_kernel_dict["periodic"]["use_log"] = [True]
+    aux_kernel_dict["periodic"]["names"] = ["p_sigma_f", "p_period"]
+    aux_kernel_dict["periodic"]["means"] = [1., 150.]
+    aux_kernel_dict["periodic"]["stds"] = [3., 30.]
+    aux_kernel_dict["periodic"]["bounds"] = [(zero_bound, None),(zero_bound, None)]
+    aux_kernel_dict["periodic"]["use_log"] = [True, True]
     
     aux_kernel_dict["rational_quadratic"] = dict()
     aux_kernel_dict["rational_quadratic"]["names"] = ["rq_sigma_f", "rq_scale", "rq_nu"]

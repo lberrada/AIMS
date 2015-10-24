@@ -7,11 +7,8 @@ Date: 19 Oct 2015
 """
 
 from data_processing import process_from_file
-from GP_model import predict
 from tune import optimize_hyperparameters
 from utils import timeit
-import csv
-from argparse import ArgumentParser
 
 @timeit
 def run(filename=None,
