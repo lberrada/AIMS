@@ -108,12 +108,13 @@ def optimize_hyperparameters(Xtraining=None,
     print('-' * 50)
     
 #     filename = "./out/" + use_kernels + "-" + use_means + "-" + estimator + "-" + variable + ".csv"
-    filename = "./out/results_v2.csv"
+    filename = "./out/results_v3-3.csv"
             
 #     with open(filename, 'w', newline='') as csvfile:
     with open(filename, 'a', newline='') as csvfile:
         my_writer = csv.writer(csvfile, delimiter='\t',
                                quoting=csv.QUOTE_MINIMAL)
+        my_writer.writerow(['-' * 50])
         my_writer.writerow([use_kernels, use_means, variable, estimator])
         my_writer.writerow(list(my_params["names"]))
         my_writer.writerow(list(np.round(params_found, 4)))

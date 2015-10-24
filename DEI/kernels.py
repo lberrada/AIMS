@@ -8,55 +8,6 @@ Date: 19 Oct 2015
 
 import numpy as np
 
-def kernel(use_kernels,
-           X1=None,
-           X2=None,
-           params=None,
-           **kwargs):
-    
-    # ensure params has the right data structure
-    params = list(params)
-    
-    sigma_n = params.pop(0)
-    
-    # parse string
-    temp_str = use_kernels.replace("*", "+")
-    all_kernels = temp_str.split("+")
-    
-    use_kernels.replace(all_kernels[0], '')
-    K = get_kernel(all_kernels.pop(0))(X1=None,
-                                       X2=None,
-                                       params=None,
-                                       **kwargs)
-    
-    while len(len(all_kernels)):
-        op = use_kernels.pop(0)
-        use_kernels.replace(all_kernels[0], "")
-        if op == "+":
-            K += get_kernel(all_kernels.pop(0))(X1=None,
-                                                X2=None,
-                                                params=None,
-                                                **kwargs)
-        
-        elif op == "*":
-            K *= get_kernel(all_kernels.pop(0))(X1=None,
-                                                X2=None,
-                                                params=None,
-                                                **kwargs)
-        else:
-            raise ValueError("shit happened")
-        
-    if len(K.shape) == 2:
-        n = len(K)
-        same_x = [np.arange(n), np.arange(n)]
-        K[same_x] += sigma_n ** 2
-        
-    elif not hasattr(K, "__len__"):
-        K += sigma_n ** 2
-        
-    return K
-    
-  
     
 def get_kernel(kernel_name):
     

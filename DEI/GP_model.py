@@ -111,19 +111,10 @@ def predict(Xtraining=None,
                                quoting=csv.QUOTE_MINIMAL)
         my_writer.writerow(['r2', round(r2, 3)])
 
-    filename = "./out/" + use_kernels + "-" + use_means + "-" + estimator + "-" + variable + ".csv"
+    filename = "./out/best.png"
     
     Ttesting = np.array([t0] * len(Xtesting), dtype='datetime64')
     Ttesting += np.array([np.timedelta64(int(x) * 5, 'm') for x in Xtesting], dtype=np.timedelta64)
-    
-#     plt.errorbar(Ttesting,
-#                  Ypredicted,
-#                  fmt='o',
-#                  ms=4,
-#                  color='red',
-#                  ecolor='red',
-#                  yerr=1.96 * np.sqrt(Yvar),
-#                  alpha=0.3)
     
     plt.fill_between(Ttesting,
                      Ypredicted - 1.96 * np.sqrt(Yvar),

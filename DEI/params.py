@@ -17,7 +17,7 @@ def get_params(use_kernels=None,
     params["names"] = ["sigma_n"]
     params["means"] = [0.5]
     params["stds"] = [1.]
-    params["bounds"] = [(zero_bound, None)]
+    params["bounds"] = [(1e-3, None)]
     params["use_log"] = [True]
     
     aux_kernel_dict = dict()
