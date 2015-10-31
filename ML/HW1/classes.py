@@ -81,7 +81,7 @@ class Node:
         self.updated = 0
         for i in range(len(self.nodes)):
             if self.nodes[i].updated:
-                self.nodes[i].setNotUpdated
+                self.nodes[i].setNotUpdated()
         
     def loopy_bp(self):
         """% loopy_bp : recursive method to prompt this node and recursively
@@ -147,9 +147,12 @@ class Node:
                 self.nodes[i].passMessageOut(self.unid)
     
     def addNode(self, node):
-        """% addNode : add a node to the neighbor node cell array
+        """% addNode : method to add a neighboring node to the list of
+        %           neighboring nodes
+        %
+        % @param node : node to add as neighbor
         %"""
-            
+
         raise ValueError('this function is meant to be abstract and over written')
         
     def getMessage(self, to_unid):
@@ -194,7 +197,6 @@ class VariableNode(Node):
         Node.__init__(self, unid)
         self.dimension = dimension
         self.observed = False
-            
         
     def addNode(self, node):
         """% addNode : method to add a neighboring node to the list of
@@ -204,7 +206,7 @@ class VariableNode(Node):
         %"""
         self.nodes.append(node)
         self.messages.append(np.ones(self.dimension))
-        
+            
         
     def getMessage(self, to_unid):
         """% getMessage : override of getMessage in node class.  THIS IS A
@@ -296,6 +298,15 @@ class FactorNode(Node):
             
         Node.__init__(self, unid)
         self.factor = factor
+        
+    def addNode(self, node):
+        """% addNode : method to add a neighboring node to the list of
+        %           neighboring nodes
+        %
+        % @param node : node to add as neighbor
+        %"""
+        self.nodes.append(node)
+        self.messages.append(np.ones(node.dimension))
         
     def getMessage(self, to_unid):
         """% getMessage : gets the message to be sent to the given node. THIS
