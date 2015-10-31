@@ -2,17 +2,17 @@
 Source: http://www.robots.ox.ac.uk/~fwood/teaching/AIMS_CDT_ML_2015/homework/HW_1_sum_product/
 
 
-% main_big_alarm_net
-%
-% This file creates the graph structure needed for the big alarm network.
-% Creating the graph structure includes creating all nodes, placing the
-% nodes into the stucture with the appropriate neighbors and assigning
-% probability tables to the factor nodes.  At the very end of this main
-% file is a for loop which is documented.  That for loop executes the
-% inference algorithm accross the graph. At initialization, every variable
-% node in the graph is unobserved.  If you wish to do inference with some
-% of the nodes observed you will need to indicate the observed variables
-% before the inference procedure is executed."""
+ main_big_alarm_net
+
+ This file creates the graph structure needed for the big alarm network.
+ Creating the graph structure includes creating all nodes, placing the
+ nodes into the stucture with the appropriate neighbors and assigning
+ probability tables to the factor nodes. At the very end of this main
+ file is a for loop which is documented. That for loop executes the
+ inference algorithm accross the graph. At initialization, every variable
+ node in the graph is unobserved. If you wish to do inference with some
+ of the nodes observed you will need to indicate the observed variables
+ before the inference procedure is executed."""
 
 import numpy as np
 from classes import Factor, VariableNode, FactorNode
@@ -26,7 +26,7 @@ fn_Hypovolemia = FactorNode('fn:Hypovolemia', fact)
 vn_Hypovolemia.addNode(fn_Hypovolemia) 
 fn_Hypovolemia.addNode(vn_Hypovolemia) 
 
-# # now we do the next node 
+# now we do the next node 
  
 f = np.zeros((2, 1))
 f[:, 0] = [0.05, 0.95] 
@@ -38,7 +38,7 @@ fn_LVFailure = FactorNode('fn:LVFailure', fact)
 vn_LVFailure.addNode(fn_LVFailure)
 fn_LVFailure.addNode(vn_LVFailure)
 
-# # now we do the next node 
+# now we do the next node 
  
 f = np.zeros((3, 2, 2))
 f[:, 0, 0] = [ 0.95, 0.04, 0.01] 
@@ -57,7 +57,7 @@ fn_LVEDVolume_Hypovolemia_LVFailure.addNode(vn_Hypovolemia)
 vn_LVFailure.addNode(fn_LVEDVolume_Hypovolemia_LVFailure) 
 fn_LVEDVolume_Hypovolemia_LVFailure.addNode(vn_LVFailure) 
 
-# # now we do the next node 
+# now we do the next node 
  
 f = np.zeros((3, 2, 2))
 f[:, 0, 0] = [ 0.98, 0.01, 0.01] 
@@ -76,7 +76,7 @@ fn_StrokeVolume_LVFailure_Hypovolemia.addNode(vn_LVFailure)
 vn_Hypovolemia.addNode(fn_StrokeVolume_LVFailure_Hypovolemia) 
 fn_StrokeVolume_LVFailure_Hypovolemia.addNode(vn_Hypovolemia) 
 
-# # now we do the next node 
+# now we do the next node 
  
 f = np.zeros((3, 3))
 f[:, 0] = [ 0.95, 0.04, 0.01] 
@@ -92,7 +92,7 @@ fn_CVP_LVEDVolume.addNode(vn_CVP)
 vn_LVEDVolume.addNode(fn_CVP_LVEDVolume) 
 fn_CVP_LVEDVolume.addNode(vn_LVEDVolume) 
 
-# # now we do the next node 
+# now we do the next node 
  
 f = np.zeros((3, 3))
 f[:, 0] = [ 0.95, 0.04, 0.01] 
@@ -108,7 +108,7 @@ fn_PCWP_LVEDVolume.addNode(vn_PCWP)
 vn_LVEDVolume.addNode(fn_PCWP_LVEDVolume) 
 fn_PCWP_LVEDVolume.addNode(vn_LVEDVolume) 
 
-# # now we do the next node 
+# now we do the next node 
  
 f = np.zeros((2, 1))
 f[:, 0] = [ 0.2, 0.8] 
@@ -120,7 +120,7 @@ fn_InsuffAnesth = FactorNode('fn:InsuffAnesth', fact)
 vn_InsuffAnesth.addNode(fn_InsuffAnesth) 
 fn_InsuffAnesth.addNode(vn_InsuffAnesth) 
 
-# # now we do the next node 
+# now we do the next node 
  
 f = np.zeros((2, 1))
 f[:, 0] = [ 0.01, 0.99] 
@@ -132,7 +132,7 @@ fn_PulmEmbolus = FactorNode('fn:PulmEmbolus', fact)
 vn_PulmEmbolus.addNode(fn_PulmEmbolus) 
 fn_PulmEmbolus.addNode(vn_PulmEmbolus) 
 
-# # now we do the next node 
+# now we do the next node 
  
 f = np.zeros((3, 1))
 f[:, 0] = [ 0.92, 0.03, 0.05] 
@@ -144,7 +144,7 @@ fn_Intubation = FactorNode('fn:Intubation', fact)
 vn_Intubation.addNode(fn_Intubation) 
 fn_Intubation.addNode(vn_Intubation) 
 
-# # now we do the next node 
+# now we do the next node 
  
 f = np.zeros((2, 2, 3))
 f[:, 0, 0] = [ 0.1, 0.9] 
@@ -165,7 +165,7 @@ fn_Shunt_PulmEmbolus_Intubation.addNode(vn_PulmEmbolus)
 vn_Intubation.addNode(fn_Shunt_PulmEmbolus_Intubation) 
 fn_Shunt_PulmEmbolus_Intubation.addNode(vn_Intubation) 
 
-# # now we do the next node 
+# now we do the next node 
  
 f = np.zeros((2, 1))
 f[:, 0] = [ 0.04, 0.96] 
@@ -177,7 +177,7 @@ fn_KinkedTube = FactorNode('fn:KinkedTube', fact)
 vn_KinkedTube.addNode(fn_KinkedTube) 
 fn_KinkedTube.addNode(vn_KinkedTube) 
 
-# # now we do the next node 
+# now we do the next node 
  
 f = np.zeros((3, 1))
 f[:, 0] = [ 0.01, 0.98, 0.01] 
@@ -189,7 +189,7 @@ fn_MinVolSet = FactorNode('fn:MinVolSet', fact)
 vn_MinVolSet.addNode(fn_MinVolSet)
 fn_MinVolSet.addNode(vn_MinVolSet)
 
-# # now we do the next node 
+# now we do the next node 
  
 f = np.zeros((4, 3))
 f[:, 0] = [ 0.01, 0.97, 0.01, 0.01] 
@@ -205,7 +205,7 @@ fn_VentMach_MinVolSet.addNode(vn_VentMach)
 vn_MinVolSet.addNode(fn_VentMach_MinVolSet)
 fn_VentMach_MinVolSet.addNode(vn_MinVolSet)
 
-# # now we do the next node 
+# now we do the next node 
  
 f = np.zeros((2, 1))
 f[:, 0] = [ 0.05, 0.95] 
@@ -217,7 +217,7 @@ fn_Disconnect = FactorNode('fn:Disconnect', fact)
 vn_Disconnect.addNode(fn_Disconnect)
 fn_Disconnect.addNode(vn_Disconnect)
 
-# # now we do the next node 
+# now we do the next node 
  
 f = np.zeros((4, 4, 2))
 f[:, 0, 0] = [ 0.97, 0.01, 0.01, 0.01] 
@@ -281,7 +281,7 @@ fn_VentLung_KinkedTube_VentTube_Intubation.addNode(vn_VentTube)
 vn_Intubation.addNode(fn_VentLung_KinkedTube_VentTube_Intubation) 
 fn_VentLung_KinkedTube_VentTube_Intubation.addNode(vn_Intubation) 
 
-# # now we do the next node 
+# now we do the next node 
  
 f = np.zeros((4, 3, 4))
 f[:, 0, 0] = [ 0.97, 0.01, 0.01, 0.01] 
@@ -308,7 +308,7 @@ fn_VentAlv_Intubation_VentLung.addNode(vn_Intubation)
 vn_VentLung.addNode(fn_VentAlv_Intubation_VentLung) 
 fn_VentAlv_Intubation_VentLung.addNode(vn_VentLung) 
 
-# # now we do the next node 
+# now we do the next node 
  
 f = np.zeros((2, 1))
 f[:, 0] = [ 0.01, 0.99] 
@@ -320,7 +320,7 @@ fn_FiO2 = FactorNode('fn:FiO2', fact)
 vn_FiO2.addNode(fn_FiO2)
 fn_FiO2.addNode(vn_FiO2) 
 
-# # now we do the next node 
+# now we do the next node 
  
 f = np.zeros((3, 4, 2))
 f[:, 0, 0] = [ 0.98, 0.01, 0.01] 
@@ -343,7 +343,7 @@ fn_PVSat_VentAlv_FiO2.addNode(vn_VentAlv)
 vn_FiO2.addNode(fn_PVSat_VentAlv_FiO2) 
 fn_PVSat_VentAlv_FiO2.addNode(vn_FiO2) 
 
-# # now we do the next node 
+# now we do the next node 
  
 f = np.zeros((3, 2, 3))
 f[:, 0, 0] = [ 0.98, 0.01, 0.01] 
@@ -364,7 +364,7 @@ fn_SaO2_Shunt_PVSat.addNode(vn_Shunt)
 vn_PVSat.addNode(fn_SaO2_Shunt_PVSat)
 fn_SaO2_Shunt_PVSat.addNode(vn_PVSat)
 
-# # now we do the next node 
+# now we do the next node 
  
 f = np.zeros((2, 1))
 f[:, 0] = [ 0.01, 0.99] 
@@ -376,7 +376,7 @@ fn_Anaphylaxis = FactorNode('fn:Anaphylaxis', fact)
 vn_Anaphylaxis.addNode(fn_Anaphylaxis) 
 fn_Anaphylaxis.addNode(vn_Anaphylaxis) 
 
-# # now we do the next node 
+# now we do the next node 
  
 f = np.zeros((3, 2))
 f[:, 0] = [ 0.98, 0.01, 0.01] 
@@ -756,7 +756,7 @@ fn_MinVol_VentLung_Intubation.addNode(vn_VentLung)
 vn_Intubation.addNode(fn_MinVol_VentLung_Intubation) 
 fn_MinVol_VentLung_Intubation.addNode(vn_Intubation) 
  
-# % set the value of any nodes which are observed
+# set the value of any nodes which are observed
 
 vn_SaO2.setValue(np.array([1, 0, 0])) 
 vn_BP.setValue(np.array([1, 0, 0]))
@@ -765,15 +765,15 @@ vn_Press.setValue(np.array([0, 1, 0, 0]))
 vn_ExpCO2.setValue(np.array([1, 0, 0, 0]))
 
 
-# % do loopy belief propagation as an inference procedure.  pass messages in
-# % every node 20 times.
+# do loopy belief propagation as an inference procedure. pass messages in
+# every node 20 times.
 
 for i in range(20):
     print('i = ' + str(i))
     vn_MinVol.loopy_bp()
     vn_MinVol.setNotUpdated()
 
-# % display the marginal distribution in the variable node for Kinked Tube, Vent Lung & Anaphy Laxis
+# display the marginal distribution in the variable node for Kinked Tube, Vent Lung & Anaphy Laxis
 print(vn_KinkedTube.getMarginalDistribution())
 print(vn_VentLung.getMarginalDistribution())
 print(vn_Anaphylaxis.getMarginalDistribution())
