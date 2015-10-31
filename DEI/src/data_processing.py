@@ -10,8 +10,11 @@ import pandas
 import numpy as np
 import copy
 import matplotlib.pyplot as plt
-import seaborn as sns
-sns.set(color_codes=True)
+try:
+    import seaborn as sns
+    sns.set(color_codes=True)
+except:
+    print("could not import seaborn, will use regular matplotlib settings")
 
 
 def process_from_file(filename,

@@ -6,11 +6,14 @@ Date: 21 Oct 2015
 
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
 import copy
 import csv
 from build import mu_K
-sns.set(color_codes=True)
+try:
+    import seaborn as sns
+    sns.set(color_codes=True)
+except:
+    print("could not import seaborn, will use regular matplotlib settings")
     
 
 def predict(Xtraining=None,
@@ -91,10 +94,10 @@ def predict(Xtraining=None,
     print('computing score...')
     
     ssres = np.sum(np.power(Ypredicted - Ytestingtruth, 2))
-    print(np.sqrt(ssres))
+    print("RMS :", np.sqrt(ssres) / len(Ypredicted))
     sstot = np.sum(np.power(Ypredicted - np.mean(Ypredicted), 2))
     r2 = 1 - ssres / sstot
-    print(r2)
+    print('r2 :', r2)
     print("done")
     print("-"*50)
     
@@ -105,11 +108,14 @@ def predict(Xtraining=None,
     
 #     filename = "../out/" + use_kernels + "-" + use_means + "-" + estimator + "-" + variable + ".csv"
     filename = "../out/results.csv"
-            
-    with open(filename, 'a', newline='') as csvfile:
-        my_writer = csv.writer(csvfile, delimiter='\t',
-                               quoting=csv.QUOTE_MINIMAL)
-        my_writer.writerow(['r2', round(r2, 3)])
+    
+    try:     
+        with open(filename, 'a', newline='') as csvfile:
+            my_writer = csv.writer(csvfile, delimiter='\t',
+                                   quoting=csv.QUOTE_MINIMAL)
+            my_writer.writerow(['r2', round(r2, 3)])
+    except:
+        print("could not write results in %s, please make sure directory exists" % filename)
 
     filename = "../out/best.png"
     
@@ -140,10 +146,14 @@ def predict(Xtraining=None,
              ms=4)
     
     fig_name = filename.replace("csv", "png")
-    plt.savefig(fig_name,
-                transparent=False,
-                dpi=200,
-                bbox_inches='tight')
+    try:
+        plt.savefig(fig_name,
+                    transparent=False,
+                    dpi=200,
+                    bbox_inches='tight')
+    except:
+        print("could not save plot in %s, please make sure directory exists" % fig_name)
+
     
     if show_plot:
         plt.show()

@@ -44,7 +44,7 @@ def run(filename=None,
             estimator=estimator,
             variable=variable,
             t0=t0,
-            show_plot=False)
+            show_plot=True)
     
 
 

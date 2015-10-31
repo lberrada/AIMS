@@ -108,7 +108,7 @@ def optimize_hyperparameters(Xtraining=None,
     print('-' * 50)
     
 #     filename = "../out/" + use_kernels + "-" + use_means + "-" + estimator + "-" + variable + ".csv"
-    filename = "../out/results_v3-3.csv"
+    filename = "../out/results.csv"
             
 #     with open(filename, 'w', newline='') as csvfile:
     with open(filename, 'a', newline='') as csvfile:

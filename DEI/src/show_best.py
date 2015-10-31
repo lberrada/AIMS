@@ -8,7 +8,7 @@ from main import run
 
 # MLE Tide
 params = [0.03, 0.1, 5e02, 9.4, 3e2, 2.9, 1, 1.5e2]
-run('sotonmet.txt', 'tide', 'matern_32 * periodic', 'constant+periodic', 'MLE', True, params)
+run('sotonmet.txt', 'tide', 'matern_32 * periodic', 'constant+periodic', 'MLE', False, params)
 
 # MAP Tide
 # params = [0.025, 0.71, 1.8e3 , 0.71, 3e2, 3]
