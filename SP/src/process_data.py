@@ -21,11 +21,9 @@ def import_data(filename):
         del data_dict[key_to_rm]
         print("\t deleted key: %s" % key_to_rm)
     
-    for key in data_dict:
-        data_dict[key]= np.array(data_dict[key]).flatten()
-        print(key, data_dict[key].shape)
-        
-    if filename!="mg.mat":
+    if filename=="fXSamples.mat":  
+        my_df = pd.DataFrame(data_dict['x'])
+    elif filename!="mg.mat":
         my_df = pd.DataFrame.from_dict(data_dict)
     else:
         my_df = pd.DataFrame(data_dict["t_tr"])
@@ -36,4 +34,5 @@ def import_data(filename):
     print("showing headers for verification...")
     
     print(my_df.head())
+    return my_df
     
