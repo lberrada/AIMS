@@ -7,7 +7,7 @@ Date: 3 Nov 2015
 import numpy as np
 import scipy.linalg
 
-def build_lagged_data(X, p):
+def embed_mat_from(X, p):
     
     n = len(X) - p
     res = np.zeros((n, p))
@@ -16,7 +16,7 @@ def build_lagged_data(X, p):
     return res
     
 
-def get_pseudo_inverse_from(X):
+def pseudo_inverse(X):
     
     aux = X.T.dot(X)
     aux_inv = np.linalg.inv(aux)
@@ -24,7 +24,7 @@ def get_pseudo_inverse_from(X):
     
     return res
 
-def get_weights_from_autocorr(X, p):
+def weights_auto_corr(X, p):
     
     Xcentered = X - np.mean(X)
 

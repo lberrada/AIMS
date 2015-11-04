@@ -12,7 +12,7 @@ def import_data(filename):
     
     print("loading %s..." % filename)
     
-    data_dict = scipy.io.loadmat(filename)
+    data_dict = scipy.io.loadmat("../data/" + filename)
     to_remove = []
     for key in data_dict:
         if "__" in key:
@@ -21,9 +21,9 @@ def import_data(filename):
         del data_dict[key_to_rm]
         print("\t deleted key: %s" % key_to_rm)
     
-    if filename=="fXSamples.mat":  
+    if filename == "fXSamples.mat":  
         my_df = pd.DataFrame(data_dict['x'])
-    elif filename!="mg.mat":
+    elif filename != "mg.mat":
         my_df = pd.DataFrame.from_dict(data_dict)
     else:
         my_df = pd.DataFrame(data_dict["t_tr"])
