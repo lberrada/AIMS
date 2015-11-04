@@ -6,7 +6,6 @@ Date: 2 Nov 2015
 
 import scipy.io
 import pandas as pd
-import numpy as np
 
 def import_data(filename):
     

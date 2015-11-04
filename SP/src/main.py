@@ -28,12 +28,11 @@ p = 5
 
 
 my_ar = AutoRegression(data_1D, p)
-my_ac = AutoCorrelation(data_1D, p)
-
 my_ar.fit()
 my_ar.predict()
 my_ar.plot_prediction()
 
+my_ac = AutoCorrelation(data_1D, p)
 my_ac.fit()
 my_ac.predict()
 my_ac.plot_prediction(show=True)

@@ -24,7 +24,7 @@ def process_from_file(filename,
     """
     
     print("importing data in dataframe...")
-    my_dataframe = pandas.read_csv(filename)
+    my_dataframe = pandas.read_csv("../data/" + filename)
     if variable == 'tide':
         my_dataframe.rename(columns={'Tide height (m)': 'y',
                                      'True tide height (m)': 'ytruth',

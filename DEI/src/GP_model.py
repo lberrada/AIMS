@@ -1,164 +1,71 @@
 """ Description here
 
 Author: Leonard Berrada
-Date: 21 Oct 2015
+Date: 4 Nov 2015
 """
+from data_processing import process_from_file
+from tune import optimize_hyperparameters
+from predict import predict
 
-import numpy as np
-import matplotlib.pyplot as plt
-import copy
-import csv
-from build import mu_K
-try:
-    import seaborn as sns
-    sns.set(color_codes=True)
-except:
-    print("could not import seaborn, will use regular matplotlib settings")
-    
 
-def predict(Xtraining=None,
-            Ytraining=None,
-            Xtesting=None,
-            params=None,
-            Ytestingtruth=None,
-            use_kernels=None,
-            use_means=None,
-            sequential_mode=False,
-            variable=None,
-            estimator=None,
-            t0=None,
-            show_plot=True,
-            validation=False):
+class GaussianProcess:
     
-    print("predicting data...")
-    
-    mu, K = mu_K(use_kernels=use_kernels,
-                 use_means=use_means,
-                 X1=Xtraining[None, :],
-                 X2=Xtraining[:, None],
-                 Xtesting=Xtraining,
-                 params=params)
-    
-    L = np.linalg.cholesky(K)
+    def __init__(self,
+                 filename=None,
+                 variable=None,
+                 use_kernels=None,
+                 use_means=None,
+                 estimator=None,
+                 sequential_mode=None,
+                 params=None):
+        
+        print(variable, use_means, use_kernels, estimator)
+        
+        self.filename = filename
+        self.variable = variable
+        self.use_kernels = use_kernels
+        self.use_means = use_means
+        self.estimator = estimator
+        self.sequential_mode = sequential_mode
+        self.params = params
+        
+        self.process_from_file()
 
-    Ypredicted = np.zeros_like(Xtesting)
-    Yvar = np.zeros_like(Xtesting)
-    Y_centered = Ytraining - mu
-    index = 0
-    
-    if sequential_mode:
-        training_len = len(Xtraining)
-        savedXtraining = copy.copy(Xtraining)
-        savedYtraining = copy.copy(Y_centered)
-    
-    for i in range(len(Xtesting)):
-        
-        xstar = Xtesting[i]
-        
-        if sequential_mode:
-            if i==0:
-                continue
-            while index < training_len and savedXtraining[index] < xstar:
-                index += 1
-            L = np.linalg.cholesky(K[:index, :index])
-            Xtraining = savedXtraining[:index]
-            Y_centered = savedYtraining[:index]
-        
-        Xstar = xstar * np.ones_like(Xtraining)
-        _, Ks = mu_K(use_kernels=use_kernels,
-                     use_means=use_means,
-                     X1=Xtraining,
-                     X2=Xstar,
-                     params=params)
-        
-        mu, Kss = mu_K(use_kernels=use_kernels,
-                      use_means=use_means,
-                      X1=xstar,
-                      X2=xstar,
-                      Xtesting=xstar,
-                      params=params)
+        if not hasattr(self.params, "__len__"):
+            print("parameters not given, estimation...")
+            self.params = self.tune_hyperparameters()
             
-        aux = np.linalg.solve(L, Ks.T)
-        KsxK_inv = np.linalg.solve(L.T, aux).T
+    def process_from_file(self):
         
-        Ypredicted[i] = np.dot(KsxK_inv, Y_centered) + mu
-        Yvar[i] = Kss - np.dot(KsxK_inv, Ks.T)
+        (self.Xtraining, 
+         self.Ytraining, 
+         self.Xtesting, 
+         self.Ytestingtruth, 
+         self.t0) = process_from_file(self.filename,
+                                      variable=self.variable)
+            
+    def tune_hyperparameters(self):
         
-    if sequential_mode:
-        Xtraining = savedXtraining 
-        Ytraining = savedYtraining
-    
-    print("done")
-    print("-"*50)
-    
-    print('computing score...')
-    
-    ssres = np.sum(np.power(Ypredicted - Ytestingtruth, 2))
-    print("RMS :", np.sqrt(ssres) / len(Ypredicted))
-    sstot = np.sum(np.power(Ypredicted - np.mean(Ypredicted), 2))
-    r2 = 1 - ssres / sstot
-    print('r2 :', r2)
-    print("done")
-    print("-"*50)
-    
-    if validation:
-        return r2
-    
-    print("creating plot...")
-    
-#     filename = "../out/" + use_kernels + "-" + use_means + "-" + estimator + "-" + variable + ".csv"
-    filename = "../out/results.csv"
-    
-    try:     
-        with open(filename, 'a', newline='') as csvfile:
-            my_writer = csv.writer(csvfile, delimiter='\t',
-                                   quoting=csv.QUOTE_MINIMAL)
-            my_writer.writerow(['r2', round(r2, 3)])
-    except:
-        print("could not write results in %s, please make sure directory exists" % filename)
-
-    filename = "../out/best.png"
-    
-    Ttesting = np.array([t0] * len(Xtesting), dtype='datetime64')
-    Ttesting += np.array([np.timedelta64(int(x) * 5, 'm') for x in Xtesting], dtype=np.timedelta64)
-    
-    plt.fill_between(Ttesting,
-                     Ypredicted - 1.96 * np.sqrt(Yvar),
-                     Ypredicted + 1.96 * np.sqrt(Yvar),
-                     color='red',
-                     alpha=0.3)
-    
-    plt.fill_between(Ttesting,
-                     Ypredicted - np.sqrt(Yvar),
-                     Ypredicted + np.sqrt(Yvar),
-                     color='red',
-                     alpha=0.3)
-    
-    plt.plot(Ttesting,
-             Ytestingtruth,
-             'ko-',
-             ms=4,
-             alpha=0.7)
-    
-    plt.plot(Ttesting,
-             Ypredicted,
-             'ro',
-             ms=4)
-    
-    fig_name = filename.replace("csv", "png")
-    try:
-        plt.savefig(fig_name,
-                    transparent=False,
-                    dpi=200,
-                    bbox_inches='tight')
-    except:
-        print("could not save plot in %s, please make sure directory exists" % fig_name)
-
-    
-    if show_plot:
-        plt.show()
-    else:
-        plt.close()
+        self.params = optimize_hyperparameters(self.Xtraining,
+                                               self.Ytraining,
+                                               use_kernels=self.use_kernels,
+                                               use_means=self.use_means,
+                                               estimator=self.estimator,
+                                               variable=self.variable)
         
-    print("done")
-
+    def predict(self):
+        
+        predict(Xtraining=self.Xtraining,
+                Ytraining=self.Ytraining,
+                Xtesting=self.Xtesting,
+                params=self.params,
+                Ytestingtruth=self.Ytestingtruth,
+                use_kernels=self.use_kernels,
+                use_means=self.use_means,
+                sequential_mode=self.sequential_mode,
+                estimator=self.estimator,
+                variable=self.variable,
+                t0=self.t0,
+                show_plot=True)
+        
+        
