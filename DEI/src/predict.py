@@ -29,24 +29,23 @@ def predict(self,
     Ypredicted = np.zeros(self.n_testing)
     Yvar = np.zeros(self.n_testing)
     Y_centered = self.Y_training() - mu
-    index = 0
+    index = 0 if self.sequential_mode else None
+    
      
     for i in range(self.n_testing):
          
         xstar = self.X_testing([i])
          
-#         if self.sequential_mode:
-#             if i==0:
-#                 continue
-#             while index < self.n_training and self.X_training(index) < xstar:
-#                 index += 1
-#             L = np.linalg.cholesky(K[:index, :index])
-#             X_training = self.X_training(stop=index)
-#             Y_centered = self.Y_training(stop=index)
+        if self.sequential_mode:
+            if i==0:
+                continue
+            while index < self.n_training and self.X_training([index]) < xstar:
+                index += 1
+            L = np.linalg.cholesky(K[:index, :index])
          
-        Xstar = xstar * np.ones(self.n_training)
+        Xstar = xstar * np.ones(len(L))
         _, Ks = train_on(self,
-                         X1=self.X_training(),
+                         X1=self.X_training(stop=index),
                          X2=Xstar)
          
         mu, Kss = train_on(self,
@@ -57,7 +56,7 @@ def predict(self,
         aux = np.linalg.solve(L, Ks.T)
         KsxK_inv = np.linalg.solve(L.T, aux).T
          
-        Ypredicted[i] = np.dot(KsxK_inv, Y_centered) + mu
+        Ypredicted[i] = np.dot(KsxK_inv, Y_centered[:index]) + mu
         Yvar[i] = Kss - np.dot(KsxK_inv, Ks.T)
         
     self._testing_df['ymean'] = Ypredicted
