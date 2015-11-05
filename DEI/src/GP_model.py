@@ -17,6 +17,7 @@ from predict import predict
 class GaussianProcess:
     
     def __init__(self,
+                 data=None,
                  filename=None,
                  variable=None,
                  use_kernels=None,
@@ -27,13 +28,20 @@ class GaussianProcess:
         
         print(variable, use_means, use_kernels, estimator)
         
-        self.filename = filename
         self.variable = variable
         self.use_kernels = use_kernels
         self.use_means = use_means
         self.estimator = estimator
         self.sequential_mode = sequential_mode
         self.params = params
+        
+        if data:
+            self._training_df['x'] = data['xtrain']
+            self._training_df['y'] = data['ytrain']
+            self._testing_df['x'] = data['xtest']
+            self._testing_df['y'] = data['ytest']
+        else:
+            self.filename = filename
         
         self.process_from_file()
 

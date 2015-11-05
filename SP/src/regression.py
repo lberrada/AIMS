@@ -13,19 +13,31 @@ import scipy.linalg
 class Regresssion:
     
     def __init__(self,
-                 training_data,
-                 testing_data):
+                 xtrain,
+                 xtest,
+                 ytrain,
+                 ytest,
+                 **kwargs):
         
         self._training_df = pd.DataFrame()
         self._testing_df = pd.DataFrame()
         
-        self.n_training = len(training_data)
-        self._training_df['x'] = np.arange(self.n_training)
-        self._training_df['y'] = training_data
+        self.n_training = len(xtrain)
+        self._training_df['x'] = xtrain
+        self._training_df['y'] = ytrain
         
-        self.n_testing = len(testing_data)
-        self._testing_df['x'] = np.arange(self.n_testing)
-        self._testing_df['y'] = testing_data
+        self.n_testing = len(xtest)
+        self._testing_df['x'] = xtest
+        self._testing_df['y'] = ytest
+        
+        print("done")
+        print("-"*50)
+        print("showing headers for verification...")
+        
+        print("Training Data :")
+        print(self._testing_df.head())
+        print("Testing Data :")
+        print(self._training_df.head())
         
     def X_training(self,
                    indices=None,
@@ -67,7 +79,7 @@ class Regresssion:
         else:
             return self._testing_df.y.values[start:stop]
         
-    def Y_pred(self, 
+    def Y_pred(self,
                    indices=None,
                    start=None,
                    stop=None):
@@ -77,7 +89,7 @@ class Regresssion:
         else:
             return self._testing_df.ypred.values[start:stop]
         
-    def Y_error(self, 
+    def Y_error(self,
                    indices=None,
                    start=None,
                    stop=None):
@@ -136,13 +148,17 @@ class Regresssion:
 class AutoRegression(Regresssion):
     
     def __init__(self,
-                 training_data,
+                 xtrain,
+                 xtest,
+                 ytrain,
+                 ytest,
                  p):
         
-        testing_data = training_data[p:]
         Regresssion.__init__(self,
-                             training_data,
-                             testing_data)
+                             xtrain,
+                             xtest,
+                             ytrain,
+                             ytest,)
         self.p = p
         
     def fit(self):
@@ -159,13 +175,17 @@ class AutoRegression(Regresssion):
 class AutoCorrelation(Regresssion):
     
     def __init__(self,
-                 training_data,
+                xtrain,
+                 xtest,
+                 ytrain,
+                 ytest,
                  p):
         
-        testing_data = training_data[p:]
         Regresssion.__init__(self,
-                             training_data,
-                             testing_data)
+                             xtrain,
+                             xtest,
+                             ytrain,
+                             ytest,)
         self.p = p
         
     def fit(self):
