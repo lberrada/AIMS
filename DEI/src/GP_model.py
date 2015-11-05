@@ -26,7 +26,11 @@ class GaussianProcess:
                  sequential_mode=None,
                  params=None):
         
-        print(variable, use_means, use_kernels, estimator)
+        print("")
+        print("Gaussian Process with :")
+        print("- mean : %s" % use_means)
+        print("- kernel : %s" % use_kernels)
+        print("- estimator : %s \n" % estimator)
         
         self.variable = variable
         self.use_kernels = use_kernels
@@ -39,16 +43,18 @@ class GaussianProcess:
             self._training_df = pd.DataFrame()
             self._testing_df = pd.DataFrame()
             self._training_df['x'] = data['xtrain']
-            self._training_df['y'] = data['ytrain']
+            self._training_df['y'] = (data['ytrain'] - np.mean(data['ytrain'])) / np.std(data['ytrain'])
             self._testing_df['x'] = data['xtest']
-            self._testing_df['y'] = data['ytest']
+            self._testing_df['ytruth'] = (data['ytest'] - np.mean(data['ytrain'])) / np.std(data['ytrain'])
+            self.n_training = len(self.X_training())
+            self.n_testing = len(self.X_testing())
         else:
             self.filename = filename
             self.process_from_file()
 
         if not hasattr(self.params, "__len__"):
-            print("parameters not given, estimation...")
-            self.params = self.tune_hyperparameters()
+            print("hyper-parameters not given, let's estimate them:")
+            self.tune_hyperparameters()
             
     def process_from_file(self):
         
@@ -215,15 +221,23 @@ class GaussianProcess:
                 print("could not write results in %s, please make sure directory exists" % out)
                     
     def show_prediction(self, 
-                        out=None):
+                        out=""):
         
         print("creating plot...")
      
         Y_std = np.sqrt(self.Y_pred_var())
-     
-        Ttesting = np.array([self.t0] * self.n_testing, dtype='datetime64')
-        Ttesting += np.array([np.timedelta64(int(x) * 5, 'm') for x in self.X_testing()], dtype=np.timedelta64)
-         
+        
+        try:
+            Ttesting = np.array([self.t0] * self.n_testing, dtype='datetime64')
+            Ttesting += np.array([np.timedelta64(int(x) * 5, 'm') for x in self.X_testing()], dtype=np.timedelta64)
+        except:
+            Ttesting = self.X_testing()
+        
+        plt.plot(self.X_training(),
+                 self.Y_training(),
+                 'b-',
+                 ms=4)
+        
         plt.fill_between(Ttesting,
                          self.Y_pred_mean() - 1.96 * Y_std,
                          self.Y_pred_mean() + 1.96 * Y_std,
@@ -238,13 +252,13 @@ class GaussianProcess:
          
         plt.plot(Ttesting,
                  self.Y_truth_testing(),
-                 'ko-',
+                 'k-',
                  ms=4,
                  alpha=0.7)
          
         plt.plot(Ttesting,
                  self.Y_pred_mean(),
-                 'ro',
+                 'r-',
                  ms=4)
          
         if out:

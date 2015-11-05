@@ -18,7 +18,10 @@ def get_mean(mean_name):
     if mean_name == "periodic":
         return periodic_mean
     
-    raise ValueError("%s mean function not implemented" % mean_name)
+    if mean_name == "quadratic":
+        return quadratic_mean
+    
+    raise NotImplementedError("%s mean function not implemented" % mean_name)
 
 def constant_mean(Xtesting,
                   params,
@@ -38,7 +41,7 @@ def linear_mean(Xtesting,
     alpha = params.pop(0)
     beta = params.pop(0)
     
-    return alpha * Xtesting + beta
+    return alpha + beta * Xtesting 
 
 def periodic_mean(Xtesting,
                   params,
@@ -48,5 +51,14 @@ def periodic_mean(Xtesting,
     period = params.pop(0)
     
     return scale * np.sin(2.*np.pi * Xtesting / period)
+
+def quadratic_mean(Xtesting,
+                   params,
+                   **kwargs):
     
+    alpha = params.pop(0)
+    beta = params.pop(0)
+    gamma = params.pop(0)
+    
+    return alpha + beta * Xtesting + gamma * np.power(Xtesting, 2) 
     

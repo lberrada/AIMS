@@ -23,7 +23,7 @@ def get_params(use_kernels=None,
     aux_kernel_dict = dict()
     aux_kernel_dict["exponential_quadratic"] = dict()
     aux_kernel_dict["exponential_quadratic"]["names"] = ["eq_sigma_f", "eq_scale"]
-    aux_kernel_dict["exponential_quadratic"]["means"] = [1., 20.]
+    aux_kernel_dict["exponential_quadratic"]["means"] = [1., 5.]
     aux_kernel_dict["exponential_quadratic"]["stds"] = [3, 10]
     aux_kernel_dict["exponential_quadratic"]["bounds"] = [(zero_bound, None), (zero_bound, None)]
     aux_kernel_dict["exponential_quadratic"]["use_log"] = [True, True]
@@ -37,14 +37,14 @@ def get_params(use_kernels=None,
     
     aux_kernel_dict["periodic"] = dict()
     aux_kernel_dict["periodic"]["names"] = ["p_sigma_f", "p_period"]
-    aux_kernel_dict["periodic"]["means"] = [1., 150.]
+    aux_kernel_dict["periodic"]["means"] = [1., 25.]
     aux_kernel_dict["periodic"]["stds"] = [3., 30.]
-    aux_kernel_dict["periodic"]["bounds"] = [(zero_bound, None),(zero_bound, None)]
+    aux_kernel_dict["periodic"]["bounds"] = [(zero_bound, None), (zero_bound, None)]
     aux_kernel_dict["periodic"]["use_log"] = [True, True]
     
     aux_kernel_dict["rational_quadratic"] = dict()
     aux_kernel_dict["rational_quadratic"]["names"] = ["rq_sigma_f", "rq_scale", "rq_nu"]
-    aux_kernel_dict["rational_quadratic"]["means"] = [1., 20., 2.]
+    aux_kernel_dict["rational_quadratic"]["means"] = [1., 5., 2.]
     aux_kernel_dict["rational_quadratic"]["stds"] = [3, 10, 2]
     aux_kernel_dict["rational_quadratic"]["bounds"] = [(zero_bound, None), (zero_bound, None), (zero_bound, None)]
     aux_kernel_dict["rational_quadratic"]["use_log"] = [True, True, True]
@@ -63,37 +63,42 @@ def get_params(use_kernels=None,
     
     aux_mean_dict["linear"] = dict()
     aux_mean_dict["linear"] ["names"] = ["l_alpha", "l_beta"]
-    aux_mean_dict["linear"] ["means"] = [0., 0.]
-    aux_mean_dict["linear"] ["stds"] = [5., 10]
+    aux_mean_dict["linear"] ["means"] = [0.5, 0.5]
+    aux_mean_dict["linear"] ["stds"] = [1., 1]
     aux_mean_dict["linear"]["bounds"] = [(None, None), (None, None)]
     aux_mean_dict["linear"]["use_log"] = [False, False]
     
+    aux_mean_dict["quadratic"] = dict()
+    aux_mean_dict["quadratic"] ["names"] = ["l_alpha", "l_beta", "l_gamma"]
+    aux_mean_dict["quadratic"] ["means"] = [1., 1., 0.5]
+    aux_mean_dict["quadratic"] ["stds"] = [5., 5., 5.]
+    aux_mean_dict["quadratic"]["bounds"] = [(None, None), (None, None), (None, None)]
+    aux_mean_dict["quadratic"]["use_log"] = [False, False, False]
+    
     aux_mean_dict["periodic"] = dict()
     aux_mean_dict["periodic"] ["names"] = ["p_scale", "p_period"]
-    aux_mean_dict["periodic"] ["means"] = [1., 150.]
-    aux_mean_dict["periodic"] ["stds"] = [3., 30]
+    aux_mean_dict["periodic"] ["means"] = [0.5, 10.]
+    aux_mean_dict["periodic"] ["stds"] = [1., 30]
     aux_mean_dict["periodic"]["bounds"] = [(zero_bound, None), (zero_bound, None)]
     aux_mean_dict["periodic"]["use_log"] = [True, True]
     
-    aux_kernels_string = use_kernels.replace("*", "+")
-    aux_means_string = use_means.replace("*", "+")
-    
-    all_kernels = aux_kernels_string.split("+")
-    all_means = aux_means_string.split("+")
-    
-    for k_name in all_kernels:
-        params["names"] += aux_kernel_dict[k_name]["names"]
-        params["means"] += aux_kernel_dict[k_name]["means"]
-        params["stds"] += aux_kernel_dict[k_name]["stds"]
-        params["bounds"] += aux_kernel_dict[k_name]["bounds"]
-        params["use_log"] += aux_kernel_dict[k_name]["use_log"]
+    for to_add_op in use_kernels.split('+'):
+        for to_mult in to_add_op.split("*"):
+            k_name = to_mult
+            params["names"] += aux_kernel_dict[k_name]["names"]
+            params["means"] += aux_kernel_dict[k_name]["means"]
+            params["stds"] += aux_kernel_dict[k_name]["stds"]
+            params["bounds"] += aux_kernel_dict[k_name]["bounds"]
+            params["use_log"] += aux_kernel_dict[k_name]["use_log"]
         
-    for m_name in all_means:
-        params["names"] += aux_mean_dict[m_name]["names"]
-        params["means"] += aux_mean_dict[m_name]["means"]
-        params["stds"] += aux_mean_dict[m_name]["stds"]
-        params["bounds"] += aux_mean_dict[m_name]["bounds"]
-        params["use_log"] += aux_mean_dict[m_name]["use_log"]
+    for to_add_op in use_means.split('+'):
+        for to_mult in to_add_op.split("*"):
+            m_name = to_mult
+            params["names"] += aux_mean_dict[m_name]["names"]
+            params["means"] += aux_mean_dict[m_name]["means"]
+            params["stds"] += aux_mean_dict[m_name]["stds"]
+            params["bounds"] += aux_mean_dict[m_name]["bounds"]
+            params["use_log"] += aux_mean_dict[m_name]["use_log"]
 
     
     params["init"] = copy.copy(params["means"])
@@ -103,13 +108,3 @@ def get_params(use_kernels=None,
         
         
         
-        
-        
-        
-    
-    
-    
-    
-    
-    
-    

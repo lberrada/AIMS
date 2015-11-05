@@ -7,8 +7,11 @@ Date: 19 Oct 2015
 """
 
 import numpy as np
+import sys
+import time
+sys.path.append("../../DEI/src/")
+from utils import timeit
 
-    
 def get_kernel(kernel_name):
     
     if "exponential_quadratic" in kernel_name:

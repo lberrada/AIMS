@@ -11,12 +11,17 @@ import csv
 from build import train_on
 from params import get_params
 
-def optimize_hyperparameters(self):
-    
-    print("optimizing hyper-parameters...")
+import sys
+import time
+sys.path.append("../../DEI/src/")
+from utils import timeit
+
+def optimize_hyperparameters(self, out=""):
     
     my_params = get_params(self.use_kernels,
                            self.use_means)
+    
+    print("optimizing hyper-parameters (%i)..." % len(my_params['init']))
     
     init_params = np.array(my_params["init"])
     mean_params = my_params["means"]
@@ -35,7 +40,7 @@ def optimize_hyperparameters(self):
                          Xtesting=self.X_training())
         
         Ycentered = self.Y_training() - mu
-
+        
         L = np.linalg.cholesky(K)
         log_det_K = 2 * np.trace(np.log(L))
         
@@ -46,8 +51,9 @@ def optimize_hyperparameters(self):
         
         neg_log_likelihood = -log_likelihood
         
+#         print(log_likelihood)
+        
         return neg_log_likelihood
-    
     
     def get_neg_log_posterior(params,
                               *args,
@@ -87,7 +93,9 @@ def optimize_hyperparameters(self):
     theta = scipy.optimize.fmin_l_bfgs_b(fitness_function,
                                          init_params,
                                          approx_grad=True,
-                                         bounds=bounds)
+                                         bounds=bounds,
+                                         maxiter=500,
+                                         disp=1)
     
     params_found = theta[0]
     if self.estimator == "MLE":
@@ -102,19 +110,19 @@ def optimize_hyperparameters(self):
     print("Score found : " + str(score))
     print('-' * 50)
     
-    filename = "../out/results.csv"
+    if out:
             
-    with open(filename, 'a', newline='') as csvfile:
-        my_writer = csv.writer(csvfile, delimiter='\t',
-                               quoting=csv.QUOTE_MINIMAL)
-        my_writer.writerow(['-' * 50])
-        my_writer.writerow([self.use_kernels,
-                            self.use_means,
-                            self.variable,
-                            self.estimator])
-        my_writer.writerow(list(my_params["names"]))
-        my_writer.writerow(list(np.round(params_found, 4)))
-        my_writer.writerow([self.estimator,
-                            score])
+        with open(out, 'a', newline='') as csvfile:
+            my_writer = csv.writer(csvfile, delimiter='\t',
+                                   quoting=csv.QUOTE_MINIMAL)
+            my_writer.writerow(['-' * 50])
+            my_writer.writerow([self.use_kernels,
+                                self.use_means,
+                                self.variable,
+                                self.estimator])
+            my_writer.writerow(list(my_params["names"]))
+            my_writer.writerow(list(np.round(params_found, 4)))
+            my_writer.writerow([self.estimator,
+                                score])
     
     return params_found.tolist()

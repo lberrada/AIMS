@@ -29,35 +29,27 @@ def train_on(self,
     aux_params = list(aux_params)
     
     #===========================================================================
-    # Compute covariance matrix (muK)
+    # Compute covariance matrix (K)
     #===========================================================================
     
     sigma_n = aux_params.pop(0)
     
-    # parse string
-    temp_str = use_kernels.replace("*", "+")
-    all_kernels = temp_str.split("+")
-
-    use_kernels = use_kernels[len(all_kernels[0]):]
-    K = get_kernel(all_kernels.pop(0))(X1=X1,
-                                       X2=X2,
-                                       params=aux_params)
-
-    while len(all_kernels):
-        op = use_kernels[0]
-        use_kernels = use_kernels[len(all_kernels[0]) + 1:]
-        if op == "+":
-            K += get_kernel(all_kernels.pop(0))(X1=X1,
-                                                X2=X2,
-                                                params=aux_params)
-        
-        elif op == "*":
-            K *= get_kernel(all_kernels.pop(0))(X1=X1,
-                                                X2=X2,
-                                                params=aux_params)
-        else:
-            raise ValueError("shit happened : %s" % op)
+    if hasattr(XX, "__len__"):
+        d1 = max(XX.shape)
+        d2 = d1
+        K = np.zeros((d1, d2))
+    else:
+        d = len(X1)
+        K = np.zeros(d)
     
+    for to_add_op in use_kernels.split('+'):
+        to_add_K = np.ones_like(K)
+        for to_mult in to_add_op.split("*"):
+            to_add_K *= get_kernel(to_mult)(X1=X1,
+                                            X2=X2,
+                                            params=aux_params)
+        K += to_add_K
+            
     if not hasattr(K, "__len__"):
         K += sigma_n ** 2
          
@@ -65,36 +57,25 @@ def train_on(self,
         n = len(K)
         same_x = [np.arange(n), np.arange(n)]
         K[same_x] += sigma_n ** 2
-        
-        
+    
     mu = 0
     
     # if no testing data, no need to compute mean
     if not hasattr(Xtesting, "__len__") and Xtesting == None:
-        return mu, K  
+        return mu, K
         
     #===========================================================================
     # Compute mean (mu)
     #===========================================================================
     
-    temp_str = use_means.replace("*", "+")
-    all_means = temp_str.split("+")
+    mu = np.zeros_like(Xtesting, dtype=np.float64)
     
-    use_means = use_means[len(all_means[0]):]
-    mu = get_mean(all_means.pop(0))(Xtesting=Xtesting,
-                                    params=aux_params)
-    
-    while len(all_kernels):
-        op = use_means[0]
-        use_means = use_means[len(all_means[0]) + 1:]
-        if op == "+":
-            mu += get_mean(all_means.pop(0))(Xtesting=Xtesting,
-                                             params=aux_params)
-        
-        elif op == "*":
-            mu *= get_mean(all_means.pop(0))(Xtesting=Xtesting,
-                                             params=aux_params)
-        else:
-            raise ValueError("shit happened : %s" % op)
+    for to_add_op in use_means.split('+'):
+        to_add_mu = np.ones_like(mu, dtype=np.float64)
+        for to_mult in to_add_op.split("*"):
+            temp = get_mean(to_mult)(Xtesting=Xtesting,
+                                           params=aux_params)
+            to_add_mu *= temp
+        mu += to_add_mu
         
     return mu, K

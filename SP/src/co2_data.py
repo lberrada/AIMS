@@ -14,7 +14,7 @@ from process_data import data_from_file
 
 from GP_model import GaussianProcess
 
-file_name = "mg.mat"
+file_name = "co2.mat"
 
 ix = 1
 p = 5
@@ -22,8 +22,9 @@ p = 5
 args = data_from_file(file_name,
                       ix=ix)
 
-Q = 1
-use_kernels = "exponential_quadratic * periodic"
+Q = 2
+use_kernels = "periodic"
+# use_kernels = "rational_quadratic"
 for _ in range(Q-1):
     use_kernels += "+ exponential_quadratic * periodic"
 use_means = "linear + periodic"

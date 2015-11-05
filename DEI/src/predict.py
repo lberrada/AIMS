@@ -55,9 +55,9 @@ def predict(self,
              
         aux = np.linalg.solve(L, Ks.T)
         KsxK_inv = np.linalg.solve(L.T, aux).T
-         
-        Ypredicted[i] = np.dot(KsxK_inv, Y_centered[:index]) + mu
-        Yvar[i] = Kss - np.dot(KsxK_inv, Ks.T)
+        
+        Ypredicted[i] = KsxK_inv.dot(Y_centered[:index]) + float(mu)
+        Yvar[i] = Kss - KsxK_inv.dot(Ks.T)
         
     self._testing_df['ymean'] = Ypredicted
     self._testing_df['yvar'] = Yvar

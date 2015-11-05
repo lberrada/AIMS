@@ -11,29 +11,23 @@ sns.set(color_codes=True)
 sys.path.append("../../DEI/src/")
 from process_data import data_from_file
 
-from GP_model import GaussianProcess
+from forecast import AutoRegression, AutoCorrelation
 
-file_name = "mg.mat"
+file_name = "sunspots.mat"
 
-ix = 1
 p = 5
 
-args = data_from_file(file_name,
-                      ix=ix)
+args = data_from_file(file_name)
 
-use_kernels = "rational_quadratic"
-use_means = "constant_mean"
-estimator = "MLE"
+my_ar = AutoRegression(*args, p=p)
+my_ar.fit()
+my_ar.predict()
+my_ar.plot_var('ypred')
 
-my_gp = GaussianProcess(data=args,
-                        use_kernels=use_kernels,
-                        use_means=use_means,
-                        estimator=estimator,
-                        sequential_mode=False)
-    
-my_gp.predict()
-my_gp.compute_score()
-my_gp.show_prediction()
+my_ac = AutoCorrelation(*args, p=p)
+my_ac.fit()
+my_ac.predict()
+my_ac.plot_var('ypred', show=True)
 
 
 

@@ -35,16 +35,20 @@ def data_from_file(file_name, **kwargs):
     
     elif file_name == "mg.mat":
         ytrain = data_dict['t_tr'].flatten()
-        ytest = data_dict['t_te'].flatten()
+        ytest = np.concatenate((ytrain, data_dict['t_te'].flatten()))
         xtrain = np.arange(len(ytrain))
         xtest = np.arange(len(ytest))
         print("NB: regression model required")
         return (xtrain, xtest, ytrain, ytest)
     
     elif file_name == "co2.mat":
-        x = data_dict['co2'].flatten()
-        print("NB: forecast model required")
-        return (x,)
+        all_data = data_dict['co2'].flatten()
+        ytrain = all_data[:500]
+        ytest = all_data
+        xtrain = np.arange(len(ytrain))
+        xtest = np.arange(len(ytest))
+        print("NB: regression model required")
+        return (xtrain, xtest, ytrain, ytest)
     
     elif file_name == "sunspots.mat":
         x = data_dict['activity'].flatten()
