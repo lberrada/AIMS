@@ -9,6 +9,7 @@ import pandas as pd
 
 import matplotlib.pyplot as plt
 import scipy.linalg
+from forecast import Forecast
 
 class Regresssion:
     
@@ -99,16 +100,6 @@ class Regresssion:
         else:
             return self._testing_df.yerr.values[start:stop]
         
-    def embed_data(self):
-        
-        n = self.n_training - self.p
-        self._emb_matrix = np.zeros((n, self.p))
-        
-        for k in range(self.p):
-            self._emb_matrix[:, k] = self.Y_training(start=self.p - 1 - k,
-                                                     stop=self.p - 1 - k + n)
-            
-            
     def fit(self):
         
         raise NotImplementedError("method should be overwritten")
@@ -145,78 +136,4 @@ class Regresssion:
         
 
     
-class AutoRegression(Regresssion):
-    
-    def __init__(self,
-                 xtrain,
-                 xtest,
-                 ytrain,
-                 ytest,
-                 p):
-        
-        Regresssion.__init__(self,
-                             xtrain,
-                             xtest,
-                             ytrain,
-                             ytest,)
-        self.p = p
-        
-    def fit(self):
-        
-        self.embed_data()
-                                           
-        self.pseudo_inv = np.linalg.pinv(self._emb_matrix)
-        
-    def predict(self):
-        
-        self._testing_df['ypred'] = self._emb_matrix.dot(self.pseudo_inv.dot(self.Y_testing()))
-        self._testing_df['yerr'] = self.Y_testing() - self.Y_pred()
-        
-class AutoCorrelation(Regresssion):
-    
-    def __init__(self,
-                xtrain,
-                 xtest,
-                 ytrain,
-                 ytest,
-                 p):
-        
-        Regresssion.__init__(self,
-                             xtrain,
-                             xtest,
-                             ytrain,
-                             ytest,)
-        self.p = p
-        
-    def fit(self):
-        
-        self.embed_data()
-        
-        Xcentered = self.Y_training() - np.mean(self.Y_training())
-
-        r = np.array([Xcentered[:-(self.p + 1)].T.dot(Xcentered[i: i - (self.p + 1)]) for i in range(self.p + 1)])
-        r /= r[0]
-        
-        self.a_hat = scipy.linalg.solve_toeplitz(r[:-1], r[1:])
-        
-        
-    def predict(self):
-        
-        self._testing_df['ypred'] = self._emb_matrix.dot(self.a_hat)
-        self._testing_df['yerr'] = self.Y_testing() - self.Y_pred()
-        
-    def spectrum(self):
-        
-        step = 1e-2
-        f_grid = np.arange(step, 1. - step, step)
-        
-        sigma_e_2 = np.var(self.Y_error())
-        Ts = 1.
-        
-        self.spectrum = sigma_e_2 * Ts * np.ones_like(f_grid)
-        for k in range(len(f_grid)):
-            ak_x_exp = [-self.a_hat[i] * np.exp(-1j * 2.*np.pi * f_grid[k] * i * Ts) for i in range(self.p)]
-            self.spectrum[k] /= abs(1. + np.sum(ak_x_exp)) ** 2
-        
-        
     

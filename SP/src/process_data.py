@@ -7,7 +7,7 @@ Date: 2 Nov 2015
 import scipy.io
 import numpy as np
 
-def process_file(file_name, **kwargs):
+def data_from_file(file_name, **kwargs):
         
     print("loading %s..." % file_name)
     
@@ -23,16 +23,16 @@ def process_file(file_name, **kwargs):
         print("\t deleted key: %s" % key_to_rm)
     
     if file_name == "fXSamples.mat":  
-        p = kwargs.get('p')
         ix = kwargs.get('ix')
-        ytrain = data_dict['x'][:, ix]
-        xtrain = np.arange(len(ytrain))
-        ytest = data_dict['x'][:, ix][p:]
-        xtest = np.arange(len(ytest))
+        x = data_dict['x'][:, ix]
+        return (x, )
+        
+    elif file_name == "finPredProb.mat":
+        x = data_dict['ttr'].flatten()
+        return (x, )
     else:
         raise NotImplementedError
     
-    return xtrain, xtest, ytrain, ytest
         
         
     
