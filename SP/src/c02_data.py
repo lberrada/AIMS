@@ -1,7 +1,7 @@
 """ Description here
 
 Author: Leonard Berrada
-Date: 2 Nov 2015
+Date: 5 Nov 2015
 """
 
 import sys
@@ -13,11 +13,7 @@ from process_data import data_from_file
 
 from forecast import AutoRegression, AutoCorrelation
 
-file_name = "finPredProb.mat"
-# file_name = "co2.mat"
-# file_name = "sunspots.mat"
-# file_name = "mg.mat"
-# file_name = "fXSamples.mat"
+file_name = "co2.mat"
 
 ix = 1
 p = 5
@@ -35,7 +31,5 @@ my_ac.fit()
 my_ac.predict()
 my_ac.plot_var('ypred', show=True)
 
-# my_ac.spectrum()
-# my_ac.plot_attr('spectrum', show=True)
 
 

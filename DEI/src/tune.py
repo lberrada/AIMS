@@ -15,7 +15,7 @@ def optimize_hyperparameters(self):
     
     print("optimizing hyper-parameters...")
     
-    my_params = get_params(self.use_kernels, 
+    my_params = get_params(self.use_kernels,
                            self.use_means)
     
     init_params = np.array(my_params["init"])
@@ -28,12 +28,13 @@ def optimize_hyperparameters(self):
                                *args,
                                **kwargs):
         
-        mu, K = train_on(self,
-                         X1=self.Xtraining[None, :],
-                         X2=self.Xtraining[:, None],
-                         Xtesting=self.Xtraining)
+        self.params = params
         
-        Ycentered = self.Ytraining - mu
+        mu, K = train_on(self,
+                         XX=self.X_training(),
+                         Xtesting=self.X_training())
+        
+        Ycentered = self.Y_training() - mu
 
         L = np.linalg.cholesky(K)
         log_det_K = 2 * np.trace(np.log(L))
@@ -107,13 +108,13 @@ def optimize_hyperparameters(self):
         my_writer = csv.writer(csvfile, delimiter='\t',
                                quoting=csv.QUOTE_MINIMAL)
         my_writer.writerow(['-' * 50])
-        my_writer.writerow([self.use_kernels, 
-                            self.use_means, 
-                            self.variable, 
+        my_writer.writerow([self.use_kernels,
+                            self.use_means,
+                            self.variable,
                             self.estimator])
         my_writer.writerow(list(my_params["names"]))
         my_writer.writerow(list(np.round(params_found, 4)))
-        my_writer.writerow([self.estimator, 
+        my_writer.writerow([self.estimator,
                             score])
     
     return params_found.tolist()

@@ -36,14 +36,15 @@ class GaussianProcess:
         self.params = params
         
         if data:
+            self._training_df = pd.DataFrame()
+            self._testing_df = pd.DataFrame()
             self._training_df['x'] = data['xtrain']
             self._training_df['y'] = data['ytrain']
             self._testing_df['x'] = data['xtest']
             self._testing_df['y'] = data['ytest']
         else:
             self.filename = filename
-        
-        self.process_from_file()
+            self.process_from_file()
 
         if not hasattr(self.params, "__len__"):
             print("parameters not given, estimation...")

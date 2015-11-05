@@ -153,13 +153,16 @@ class AutoCorrelation(Forecast):
         self._pred_df['ypred'] = self._emb_matrix.dot(self.a_hat)
         self._pred_df['yerr'] = self.Y(start=self.p) - self.Y_pred()
         
-    def spectrum(self):
+    def spectrum(self, 
+                 step=1e-2, 
+                 start=0, 
+                 stop=1, 
+                 Ts=1.):
         
-        step = 1e-2
-        f_grid = np.arange(step, 1. - step, step)
+        f_grid = np.arange(start + step, stop - step, step)
         
         sigma_e_2 = np.var(self.Y_error())
-        Ts = 1.
+        Ts = Ts
         
         self.spectrum = sigma_e_2 * Ts * np.ones_like(f_grid)
         for k in range(len(f_grid)):
