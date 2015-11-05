@@ -10,20 +10,27 @@ from kernels import get_kernel
 from means import get_mean
 import copy
 
-def mu_K(use_kernels=None,
-         use_means=None,
-         X1=None,
-         X2=None,
-         Xtesting=None,
-         params=None,
-         **kwargs):
+def train_on(self,
+             X1=None,
+             X2=None,
+             XX=None,
+             Xtesting=None):
     
-    use_means = use_means.replace(" ", "")
-    use_kernels = use_kernels.replace(" ", "")
+    if hasattr(XX, "__len__"):
+        X1 = XX[:, None]
+        X2 = XX[None, :]
+    
+    # clean string for combination of means and kernels
+    use_means = self.use_means.replace(" ", "")
+    use_kernels = self.use_kernels.replace(" ", "")
     
     # ensure aux_params has the right data structure
-    aux_params = copy.copy(params)
+    aux_params = copy.copy(self.params)
     aux_params = list(aux_params)
+    
+    #===========================================================================
+    # Compute covariance matrix (muK)
+    #===========================================================================
     
     sigma_n = aux_params.pop(0)
     
@@ -62,10 +69,14 @@ def mu_K(use_kernels=None,
         
     mu = 0
     
+    # if no testing data, no need to compute mean
     if not hasattr(Xtesting, "__len__") and Xtesting == None:
         return mu, K  
         
-        
+    #===========================================================================
+    # Compute mean (mu)
+    #===========================================================================
+    
     temp_str = use_means.replace("*", "+")
     all_means = temp_str.split("+")
     

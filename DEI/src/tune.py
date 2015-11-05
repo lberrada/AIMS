@@ -8,19 +8,15 @@ import numpy as np
 import scipy.stats
 import scipy.optimize
 import csv
-from build import mu_K
+from build import train_on
 from params import get_params
 
-def optimize_hyperparameters(Xtraining=None,
-                             Ytraining=None,
-                             use_kernels="gaussian",
-                             estimator="MAP",
-                             variable=None,
-                             use_means="constant"):
+def optimize_hyperparameters(self):
     
     print("optimizing hyper-parameters...")
     
-    my_params = get_params(use_kernels, use_means)
+    my_params = get_params(self.use_kernels, 
+                           self.use_means)
     
     init_params = np.array(my_params["init"])
     mean_params = my_params["means"]
@@ -32,14 +28,12 @@ def optimize_hyperparameters(Xtraining=None,
                                *args,
                                **kwargs):
         
-        mu, K = mu_K(use_means=use_means,
-                     use_kernels=use_kernels,
-                     X1=Xtraining[None, :],
-                     X2=Xtraining[:, None],
-                     Xtesting=Xtraining,
-                     params=params)
+        mu, K = train_on(self,
+                         X1=self.Xtraining[None, :],
+                         X2=self.Xtraining[:, None],
+                         Xtesting=self.Xtraining)
         
-        Ycentered = Ytraining - mu
+        Ycentered = self.Ytraining - mu
 
         L = np.linalg.cholesky(K)
         log_det_K = 2 * np.trace(np.log(L))
@@ -80,14 +74,14 @@ def optimize_hyperparameters(Xtraining=None,
         
         return neg_log_posterior
         
-    if estimator.lower() == "mle":
+    if self.estimator.lower() == "mle":
         fitness_function = get_neg_log_likelihood
         
-    elif estimator.lower() == "map":
+    elif self.estimator.lower() == "map":
         fitness_function = get_neg_log_posterior
     
     else:
-        raise ValueError("%s estimator is not implemented: should be 'MLE' or 'MAP'" % estimator)
+        raise ValueError("%s estimator is not implemented: should be 'MLE' or 'MAP'" % self.estimator)
 
     theta = scipy.optimize.fmin_l_bfgs_b(fitness_function,
                                          init_params,
@@ -95,7 +89,7 @@ def optimize_hyperparameters(Xtraining=None,
                                          bounds=bounds)
     
     params_found = theta[0]
-    if estimator == "MLE":
+    if self.estimator == "MLE":
         score = get_neg_log_likelihood(params_found)
     else:
         score = get_neg_log_posterior(params_found)
@@ -107,17 +101,19 @@ def optimize_hyperparameters(Xtraining=None,
     print("Score found : " + str(score))
     print('-' * 50)
     
-#     filename = "../out/" + use_kernels + "-" + use_means + "-" + estimator + "-" + variable + ".csv"
     filename = "../out/results.csv"
             
-#     with open(filename, 'w', newline='') as csvfile:
     with open(filename, 'a', newline='') as csvfile:
         my_writer = csv.writer(csvfile, delimiter='\t',
                                quoting=csv.QUOTE_MINIMAL)
         my_writer.writerow(['-' * 50])
-        my_writer.writerow([use_kernels, use_means, variable, estimator])
+        my_writer.writerow([self.use_kernels, 
+                            self.use_means, 
+                            self.variable, 
+                            self.estimator])
         my_writer.writerow(list(my_params["names"]))
         my_writer.writerow(list(np.round(params_found, 4)))
-        my_writer.writerow([estimator, score])
+        my_writer.writerow([self.estimator, 
+                            score])
     
     return params_found.tolist()

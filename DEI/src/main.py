@@ -28,6 +28,8 @@ def run(filename=None,
                             params=params)
     
     my_gp.predict()
+    my_gp.compute_score()
+    my_gp.show_prediction()
     
 
 
