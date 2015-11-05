@@ -11,7 +11,6 @@ sns.set(color_codes=True)
 
 sys.path.append("../../DEI/src/")
 
-from utils import get_spectral_est
 from process_data import import_data
 from regression import AutoRegression, AutoCorrelation
 
@@ -30,16 +29,14 @@ p = 5
 my_ar = AutoRegression(data_1D, p)
 my_ar.fit()
 my_ar.predict()
-my_ar.plot_prediction()
+my_ar.plot_var('ypred')
 
 my_ac = AutoCorrelation(data_1D, p)
 my_ac.fit()
 my_ac.predict()
-my_ac.plot_prediction(show=True)
+my_ac.plot_var('ypred', show=True)
 
-a_hat = my_ac.get("a_hat")
-err = my_ac.get("error")
+my_ac.spectrum()
+my_ac.plot_attr('spectrum', show=True)
 
-spec_pow_density = get_spectral_est(a_hat, err)
-plt.plot(spec_pow_density)
-plt.show()
+
