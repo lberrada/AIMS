@@ -16,14 +16,14 @@ from GP_model import GaussianProcess
 from forecast import AutoCorrelation, AutoRegression
 
 file_name = "mg.mat"
-model="GP"
+model = "AR"
 
 args = data_from_file(file_name)
 
 Q = 3
 use_kernels = "exponential_quadratic* cosine"
 # use_kernels = "rational_quadratic"
-for _ in range(Q-1):
+for _ in range(Q - 1):
     use_kernels += "+ exponential_quadratic * cosine"
 use_means = "constant"
 estimator = "MAP"
@@ -36,7 +36,7 @@ data = dict()
 # plt.show()
 
 if model.lower() == "ar":
-    p = 100
+    p = 200
     my_ar = AutoRegression(data['ytrain'], p)
     my_ar.fit()
     future = data["ytest"][len(data["ytrain"]):]

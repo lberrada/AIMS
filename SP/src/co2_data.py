@@ -22,7 +22,7 @@ file_name = "co2.mat"
 args = data_from_file(file_name)
 
 model = "GP"
-# model = "AR"
+model = "AR"
 # model = "AC"
 
 Q = 3
@@ -40,7 +40,7 @@ data = dict()
 # plt.show()
 
 if model.lower() == "ar":
-    p = 100
+    p = 50
     my_ar = AutoRegression(data['ytrain'], p)
     my_ar.fit()
     future = data["ytest"][len(data["ytrain"]):]
@@ -50,7 +50,7 @@ if model.lower() == "ar":
     my_ar.plot_var('ypred', show=True, c="red")
     
 if model.lower() == "ac":
-    p = 20
+    p = 50
     my_ac = AutoCorrelation(data['ytrain'], p)
     my_ac.fit()
     future = data["ytest"][len(data["ytrain"]):]

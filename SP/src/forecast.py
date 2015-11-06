@@ -137,7 +137,7 @@ class AutoRegression(Forecast):
             _pred_df['yerr'] = np.zeros(n_pred)
             y = copy.copy(self.Y(start=-self.p))
             for i in range(n_pred):
-                pred = self._a_hat.T.dot(y)
+                pred = self._a_hat[::-1].dot(y)
                 y[:-1] = y[1:]
                 y[-1] = pred
                 _pred_df['ypred'][i] = pred
