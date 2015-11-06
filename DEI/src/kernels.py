@@ -29,6 +29,9 @@ def get_kernel(kernel_name):
     if "matern_32" in kernel_name:
         return matern_32_kernel
     
+    if "cosine" in kernel_name:
+        return cosine_kernel
+    
     raise ValueError("%s kernel not implemented:" % kernel_name)
 
 def exponential_quadratic_kernel(X1=None,
@@ -45,6 +48,7 @@ def exponential_quadratic_kernel(X1=None,
     
     return K
 
+
 def periodic_kernel(X1=None,
                     X2=None,
                     params=None,
@@ -55,6 +59,18 @@ def periodic_kernel(X1=None,
     
     D = X1 - X2
     K = sigma_f ** 2 * np.exp(-2 * np.power(np.sin(2 * np.pi * D / period), 2))
+    
+    return K
+
+def cosine_kernel(X1=None,
+                  X2=None,
+                  params=None,
+                  **kwargs):
+    
+    period = params.pop(0)
+    
+    D = X1 - X2
+    K = np.cos(2 * np.pi * D / period)
     
     return K
 

@@ -21,13 +21,19 @@ def optimize_hyperparameters(self, out=""):
     my_params = get_params(self.use_kernels,
                            self.use_means)
     
-    print("optimizing hyper-parameters (%i)..." % len(my_params['init']))
+    print("optimizing hyper-parameters (%i)..." % len(my_params['means']))
     
-    init_params = np.array(my_params["init"])
     mean_params = my_params["means"]
-    mean_stds = my_params["stds"]
+    std_params = my_params["stds"]
     bounds = my_params["bounds"]
     use_log = my_params["use_log"]
+    
+    init_params = self.params
+    
+    print("initialization of parameters :")
+    print(my_params["names"])
+    print(np.round(self.params, 2).tolist())
+    
     
     def get_neg_log_likelihood(params,
                                *args,
@@ -51,8 +57,6 @@ def optimize_hyperparameters(self, out=""):
         
         neg_log_likelihood = -log_likelihood
         
-#         print(log_likelihood)
-        
         return neg_log_likelihood
     
     def get_neg_log_posterior(params,
@@ -73,7 +77,7 @@ def optimize_hyperparameters(self, out=""):
             
             log_prior += scipy.stats.norm.logpdf(x,
                                                loc=mu,
-                                               scale=mean_stds[i])
+                                               scale=std_params[i])
         
         log_posterior = log_likelihood + log_prior
         
@@ -94,7 +98,7 @@ def optimize_hyperparameters(self, out=""):
                                          init_params,
                                          approx_grad=True,
                                          bounds=bounds,
-                                         maxiter=500,
+                                         maxiter=300,
                                          disp=1)
     
     params_found = theta[0]

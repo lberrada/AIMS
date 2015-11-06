@@ -16,36 +16,43 @@ def get_params(use_kernels=None,
     params = dict()
     params["names"] = ["sigma_n"]
     params["means"] = [0.5]
-    params["stds"] = [1.]
+    params["stds"] = [0.5]
     params["bounds"] = [(1e-3, None)]
     params["use_log"] = [True]
     
     aux_kernel_dict = dict()
     aux_kernel_dict["exponential_quadratic"] = dict()
     aux_kernel_dict["exponential_quadratic"]["names"] = ["eq_sigma_f", "eq_scale"]
-    aux_kernel_dict["exponential_quadratic"]["means"] = [1., 5.]
-    aux_kernel_dict["exponential_quadratic"]["stds"] = [3, 10]
+    aux_kernel_dict["exponential_quadratic"]["means"] = [0.5, 5.]
+    aux_kernel_dict["exponential_quadratic"]["stds"] = [0.5, 3]
     aux_kernel_dict["exponential_quadratic"]["bounds"] = [(zero_bound, None), (zero_bound, None)]
     aux_kernel_dict["exponential_quadratic"]["use_log"] = [True, True]
     
     aux_kernel_dict["exponential_quadratic_2"] = dict()
     aux_kernel_dict["exponential_quadratic_2"]["names"] = ["eq_sigma_f", "eq_scale"]
     aux_kernel_dict["exponential_quadratic_2"]["means"] = [0.5, 100.]
-    aux_kernel_dict["exponential_quadratic_2"]["stds"] = [1, 40]
+    aux_kernel_dict["exponential_quadratic_2"]["stds"] = [0.5, 3]
     aux_kernel_dict["exponential_quadratic_2"]["bounds"] = [(zero_bound, None), (zero_bound, None)]
     aux_kernel_dict["exponential_quadratic_2"]["use_log"] = [True, True]
     
     aux_kernel_dict["periodic"] = dict()
     aux_kernel_dict["periodic"]["names"] = ["p_sigma_f", "p_period"]
-    aux_kernel_dict["periodic"]["means"] = [1., 25.]
-    aux_kernel_dict["periodic"]["stds"] = [3., 30.]
+    aux_kernel_dict["periodic"]["means"] = [0.5, 25.]
+    aux_kernel_dict["periodic"]["stds"] = [0.5, 3.]
     aux_kernel_dict["periodic"]["bounds"] = [(zero_bound, None), (zero_bound, None)]
     aux_kernel_dict["periodic"]["use_log"] = [True, True]
+    
+    aux_kernel_dict["cosine"] = dict()
+    aux_kernel_dict["cosine"]["names"] = ["c_period"]
+    aux_kernel_dict["cosine"]["means"] = [25.]
+    aux_kernel_dict["cosine"]["stds"] = [10.]
+    aux_kernel_dict["cosine"]["bounds"] = [(zero_bound, None)]
+    aux_kernel_dict["cosine"]["use_log"] = [True]
     
     aux_kernel_dict["rational_quadratic"] = dict()
     aux_kernel_dict["rational_quadratic"]["names"] = ["rq_sigma_f", "rq_scale", "rq_nu"]
     aux_kernel_dict["rational_quadratic"]["means"] = [1., 5., 2.]
-    aux_kernel_dict["rational_quadratic"]["stds"] = [3, 10, 2]
+    aux_kernel_dict["rational_quadratic"]["stds"] = [0.5, 3, 0.5]
     aux_kernel_dict["rational_quadratic"]["bounds"] = [(zero_bound, None), (zero_bound, None), (zero_bound, None)]
     aux_kernel_dict["rational_quadratic"]["use_log"] = [True, True, True]
     
@@ -76,9 +83,9 @@ def get_params(use_kernels=None,
     aux_mean_dict["quadratic"]["use_log"] = [False, False, False]
     
     aux_mean_dict["periodic"] = dict()
-    aux_mean_dict["periodic"] ["names"] = ["p_scale", "p_period"]
-    aux_mean_dict["periodic"] ["means"] = [0.5, 10.]
-    aux_mean_dict["periodic"] ["stds"] = [1., 30]
+    aux_mean_dict["periodic"] ["names"] = ["pm_scale", "pm_period"]
+    aux_mean_dict["periodic"] ["means"] = [1., 10.]
+    aux_mean_dict["periodic"] ["stds"] = [1., 3]
     aux_mean_dict["periodic"]["bounds"] = [(zero_bound, None), (zero_bound, None)]
     aux_mean_dict["periodic"]["use_log"] = [True, True]
     
@@ -100,8 +107,6 @@ def get_params(use_kernels=None,
             params["bounds"] += aux_mean_dict[m_name]["bounds"]
             params["use_log"] += aux_mean_dict[m_name]["use_log"]
 
-    
-    params["init"] = copy.copy(params["means"])
     
     return params
         

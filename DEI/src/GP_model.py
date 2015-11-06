@@ -9,9 +9,14 @@ import pandas as pd
 import copy
 import csv
 import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set(color_codes=True)
+
+import scipy.stats
 
 from tune import optimize_hyperparameters
 from predict import predict
+from params import get_params
 
 
 class GaussianProcess:
@@ -53,8 +58,61 @@ class GaussianProcess:
             self.process_from_file()
 
         if not hasattr(self.params, "__len__"):
-            print("hyper-parameters not given, let's estimate them:")
-            self.tune_hyperparameters()
+            print("hyper-parameters not given, random initialization...")
+            my_params = get_params(self.use_kernels,
+                                   self.use_means)
+    
+            mean_params = my_params["means"]
+            std_params = my_params["stds"]
+            use_log = my_params["use_log"]
+            
+            self.params = np.zeros_like(mean_params)
+            for k in range(len(self.params)):
+                if use_log[k]:
+                    self.params[k] = scipy.stats.lognorm.rvs(1,
+                                                            loc=mean_params[k],
+                                                            scale=std_params[k])
+                else:
+                    self.params[k] = scipy.stats.norm.rvs(loc=mean_params[k],
+                                                          scale=std_params[k])
+                    
+    def give_scales(self, scales):
+        
+        print("initial parameters given...")
+        
+        fond_scale = scales[0]
+        
+        assert len(scales) == len(self.use_kernels.split("+")), 'give as many scales as groupements of kernels'
+        
+#         groups_of_kernels = self.use_kernels.split("+")
+#         index_count = 0
+#         for group_of_kernel in groups_of_kernels:
+#             scale = scales.pop(0)
+#             for _ in group_of_kernel.split("+"):
+#                 self.params[index_count] = scale
+#                 index_count += 1
+        params = get_params(self.use_kernels,
+                            self.use_means)
+        
+        scale = fond_scale
+        for k in range(len(self.params)):
+            curr_name = params["names"][k]
+            if "sigma_f" in curr_name:
+                scale = scales.pop(0)
+            elif "period" in curr_name or "scale" in curr_name:
+                self.params[k] = scale
+        
+        try:
+            ind = params["names"].index("pm_period")
+            self.params[ind] = fond_scale
+        except:
+            pass
+        
+        print("new initial parameters:")
+        
+        for k in range(len(params["names"])):
+            print(params["names"][k], round(self.params[k], 2))
+                
             
     def process_from_file(self):
         
@@ -108,7 +166,7 @@ class GaussianProcess:
         print(self._testing_df.head())
         print('-' * 50)
     
-    def X_training(self, 
+    def X_training(self,
                    indices=None,
                    start=None,
                    stop=None):
@@ -118,7 +176,7 @@ class GaussianProcess:
         else:
             return self._training_df.x.values[start:stop]
     
-    def X_testing(self, 
+    def X_testing(self,
                    indices=None,
                    start=None,
                    stop=None):
@@ -128,7 +186,7 @@ class GaussianProcess:
         else:
             return self._testing_df.x.values[start:stop]
     
-    def Y_training(self, 
+    def Y_training(self,
                    indices=None,
                    start=None,
                    stop=None):
@@ -138,7 +196,7 @@ class GaussianProcess:
         else:
             return self._training_df.y.values[start:stop]
     
-    def Y_testing(self, 
+    def Y_testing(self,
                    indices=None,
                    start=None,
                    stop=None):
@@ -148,7 +206,7 @@ class GaussianProcess:
         else:
             return self._testing_df.y.values[start:stop]
     
-    def Y_truth_training(self, 
+    def Y_truth_training(self,
                    indices=None,
                    start=None,
                    stop=None):
@@ -158,7 +216,7 @@ class GaussianProcess:
         else:
             return self._training_df.ytruth.values[start:stop]
     
-    def Y_truth_testing(self, 
+    def Y_truth_testing(self,
                    indices=None,
                    start=None,
                    stop=None):
@@ -168,7 +226,7 @@ class GaussianProcess:
         else:
             return self._testing_df.ytruth.values[start:stop]
     
-    def Y_pred_mean(self, 
+    def Y_pred_mean(self,
                    indices=None,
                    start=None,
                    stop=None):
@@ -178,7 +236,7 @@ class GaussianProcess:
         else:
             return self._testing_df.ymean.values[start:stop]
         
-    def Y_pred_var(self, 
+    def Y_pred_var(self,
                    indices=None,
                    start=None,
                    stop=None):
@@ -220,7 +278,7 @@ class GaussianProcess:
             except:
                 print("could not write results in %s, please make sure directory exists" % out)
                     
-    def show_prediction(self, 
+    def show_prediction(self,
                         out=""):
         
         print("creating plot...")
