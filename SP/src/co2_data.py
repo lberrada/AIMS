@@ -8,7 +8,7 @@ import sys
 import numpy as np
 import scipy.signal as signal
 import matplotlib.pyplot as plt
-
+import scipy.stats
 
 from forecast import AutoRegression, AutoCorrelation
 
@@ -22,8 +22,8 @@ file_name = "co2.mat"
 args = data_from_file(file_name)
 
 model = "GP"
-model = "AR"
-model = "AC"
+# model = "AR"
+# model = "AC"
 
 Q = 3
 use_kernels = "exponential_quadratic* cosine"
@@ -80,7 +80,8 @@ if model.lower() == "gp":
                             use_means=use_means,
                             estimator=estimator,
                             sequential_mode=False)
-    my_gp.give_scales(periods)
+    
+    my_gp.update_scales(nyquist_freq=0.5)
     my_gp.tune_hyperparameters()
     my_gp.predict()
     my_gp.compute_score()

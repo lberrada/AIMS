@@ -16,7 +16,7 @@ from GP_model import GaussianProcess
 from forecast import AutoCorrelation, AutoRegression
 
 file_name = "mg.mat"
-model="AC"
+model="GP"
 
 args = data_from_file(file_name)
 
@@ -26,7 +26,7 @@ use_kernels = "exponential_quadratic* cosine"
 for _ in range(Q-1):
     use_kernels += "+ exponential_quadratic * cosine"
 use_means = "constant"
-estimator = "MLE"
+estimator = "MAP"
 
 data = dict()
 
@@ -76,7 +76,8 @@ if model.lower() == "gp":
                             use_means=use_means,
                             estimator=estimator,
                             sequential_mode=False)
-    my_gp.give_scales(periods)
+    
+    my_gp.update_scales(nyquist_freq=0.5)
     my_gp.tune_hyperparameters()
     my_gp.predict()
     my_gp.compute_score()

@@ -76,44 +76,20 @@ class GaussianProcess:
                     self.params[k] = scipy.stats.norm.rvs(loc=mean_params[k],
                                                           scale=std_params[k])
                     
-    def give_scales(self, scales):
+    def update_scales(self, nyquist_freq=0.5):
         
-        print("initial parameters given...")
+        print("initial parameters updated with uniform drawn within nyquist frequency")
         
-        fond_scale = scales[0]
-        
-        assert len(scales) == len(self.use_kernels.split("+")), 'give as many scales as groupements of kernels'
-        
-#         groups_of_kernels = self.use_kernels.split("+")
-#         index_count = 0
-#         for group_of_kernel in groups_of_kernels:
-#             scale = scales.pop(0)
-#             for _ in group_of_kernel.split("+"):
-#                 self.params[index_count] = scale
-#                 index_count += 1
         params = get_params(self.use_kernels,
                             self.use_means)
         
-        scale = fond_scale
         for k in range(len(self.params)):
             curr_name = params["names"][k]
-            if "sigma_f" in curr_name:
-                scale = scales.pop(0)
-            elif "period" in curr_name or "scale" in curr_name:
-                self.params[k] = scale
+            if "period" in curr_name or "scale" in curr_name:
+                freq = scipy.stats.uniform.rvs() * nyquist_freq
+                self.params[k] = 1./freq
         
-        try:
-            ind = params["names"].index("pm_period")
-            self.params[ind] = fond_scale
-        except:
-            pass
         
-        print("new initial parameters:")
-        
-        for k in range(len(params["names"])):
-            print(params["names"][k], round(self.params[k], 2))
-                
-            
     def process_from_file(self):
         
         print("importing data in dataframe...")
