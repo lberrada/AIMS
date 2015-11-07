@@ -5,17 +5,17 @@ Date: 5 Nov 2015
 """
 
 import sys
+sys.path.append("../")
+
 import numpy as np
 import scipy.signal as signal
 import matplotlib.pyplot as plt
 import scipy.stats
 
-from forecast import AutoRegression, AutoCorrelation
+from Regression import AutoRegressive, AutoCorrelation, GaussianProcess
 
-sys.path.append("../../DEI/src/")
 from process_data import data_from_file
 
-from GP_model import GaussianProcess
 
 file_name = "co2.mat"
 
@@ -41,7 +41,7 @@ data = dict()
 
 if model.lower() == "ar":
     p = 50
-    my_ar = AutoRegression(data['ytrain'], p)
+    my_ar = AutoRegressive(data['ytrain'], p)
     my_ar.fit()
     future = data["ytest"][len(data["ytrain"]):]
     my_ar.predict(future=future)

@@ -5,13 +5,14 @@ Date: 5 Nov 2015
 """
 
 import sys
+sys.path.append("../")
+
 import seaborn as sns
 sns.set(color_codes=True)
 
-sys.path.append("../../DEI/src/")
 from process_data import data_from_file
 
-from forecast import AutoRegression, AutoCorrelation
+from Regression.forecast import AutoRegressive, AutoCorrelation
 
 file_name = "finPredProb.mat"
 
@@ -21,7 +22,7 @@ p = 5
 args = data_from_file(file_name,
                       ix=ix)
 
-my_ar = AutoRegression(*args, p=p)
+my_ar = AutoRegressive(*args, p=p)
 my_ar.fit()
 my_ar.predict()
 my_ar.plot_var('ypred')
