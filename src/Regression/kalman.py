@@ -6,17 +6,17 @@ Date: 6 Nov 2015
 
 import numpy as np
 
-from forecast import Forecast
+from regression import Regression
 
-class KalmanFilter(Forecast):
+class KalmanFilter(Regression):
     
     def __init__(self,
-                 y):
+                 data):
     
-        Forecast.__init__(self, 
-                          y)
+        Regression.__init__(self, 
+                          data)
         
-        self.dim = y.shape[1]
+        self.dim = -1
         
         # state transition model
         self.F = np.eye(self.dim)
