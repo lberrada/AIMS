@@ -27,7 +27,7 @@ def run(file_name=None,
                             use_means=use_means,
                             estimator=estimator,
                             sequential_mode=sequential_mode,
-                            params=params)
+                            params=None)
     
     my_gp.predict()
     my_gp.compute_score()
@@ -43,8 +43,8 @@ def run(file_name=None,
 # run('sotonmet.txt', 'tide', 'matern_12 * periodic', 'constant', 'MAP', False, params)
 
 # MLE temp
-# params = [0.25, 0.47, 3.8, 2.9, 41, 12]
-# run('sotonmet.txt', 'temperature', 'exponential_quadratic + exponential_quadratic', 'constant', 'MLE', False, params)
+params = [0.25, 0.47, 3.8, 2.9, 41, 12]
+run('sotonmet.txt', 'temperature', 'exponential_quadratic + exponential_quadratic', 'constant', 'MLE', False, params)
 
 # MAP temp
 # params = [0.16, 1.5, 2.2e2, 1.9, 5.9e02, 12]

@@ -51,9 +51,9 @@ class GaussianProcess(RegressionModel):
 
         RegressionModel.__init__(self, data_dict)
 
-        self.init_params()
-
         self.process_strings()
+        
+        self.init_params()
 
     def init_params(self):
 
@@ -76,6 +76,8 @@ class GaussianProcess(RegressionModel):
                 else:
                     self.params[k] = scipy.stats.norm.rvs(loc=mean_params[k],
                                                           scale=std_params[k])
+                    
+            self.tune_hyperparameters()
 
     def process_strings(self):
 

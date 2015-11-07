@@ -33,7 +33,7 @@ def optimize_hyperparameters(self, out=""):
                                *args,
                                **kwargs):
         
-        self.params = params
+        self.params = list(params)
         
         mu = self.compute_mu(Xtesting=self.X_training())
         K = self.compute_K(XX=self.X_training())
