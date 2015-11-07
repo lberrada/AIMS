@@ -30,7 +30,7 @@ class Regression:
             self._testing_df = pd.DataFrame()
             self.n_testing = len(data['ytest'])
             self._testing_df['y'] = data['ytest']
-            if data.has_key():
+            if data.has_key('xtest'):
                 self._testing_df['x'] = data['xtest']
             else:
                 self._testing_df['x'] = np.arange(self.n_testing)
@@ -92,9 +92,9 @@ class Regression:
                stop=None):
 
         if hasattr(indices, "__len__"):
-            return self._testing_df.ypred.values[indices]
+            return self._pred_df.ypred.values[indices]
         else:
-            return self._testing_df.ypred.values[start:stop]
+            return self._pred_df.ypred.values[start:stop]
 
     def Y_error(self,
                 indices=None,
@@ -102,9 +102,9 @@ class Regression:
                 stop=None):
 
         if hasattr(indices, "__len__"):
-            return self._testing_df.yerr.values[indices]
+            return self._pred_df.yerr.values[indices]
         else:
-            return self._testing_df.yerr.values[start:stop]
+            return self._pred_df.yerr.values[start:stop]
         
     def embed_data(self):
         
@@ -127,24 +127,20 @@ class Regression:
 
         return getattr(self, attr_name)
 
-    def plot_attr(self, attr_name, show=False):
+    def plot_attr(self, attr_name, show=False, **kwargs):
 
         attr_to_plot = getattr(self, attr_name)
 
-        plt.plot(attr_to_plot)
+        plt.plot(attr_to_plot, **kwargs)
 
         if show:
             plt.show()
 
-    def plot_var(self, var_name, set_="", show=False):
+    def plot_var(self, var_name, set_="", lag=None, show=False, **kwargs):
 
-        if 'train' in set_.lower():
-            var_to_plot = self._training_df[var_name].values
+        var_to_plot = getattr(self, var_name)
 
-        else:
-            var_to_plot = self._testing_df[var_name].values
-
-        plt.plot(var_to_plot)
+        plt.plot(var_to_plot(start=lag), **kwargs)
 
         if show:
             plt.show()

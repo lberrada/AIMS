@@ -26,7 +26,7 @@ class AutoCorrelation(Regression):
 
         self.embed_data()
 
-        Ycentered = self.Y() - np.mean(self.Y())
+        Ycentered = self.Y_training() - np.mean(self.Y_training())
 
         r = np.array([Ycentered[
                      :-(self.p + 1)].T.dot(Ycentered[i: i - (self.p + 1)]) for i in range(self.p + 1)])
@@ -34,27 +34,25 @@ class AutoCorrelation(Regression):
 
         self._a_hat = scipy.linalg.solve_toeplitz(r[:-1], r[1:])
 
-    def predict(self, future=None):
+    def predict(self):
 
-        if not hasattr(future, "__len__"):
-            self._pred_df['ypred'] = self._emb_matrix.dot(self._a_hat)
-            self._pred_df['yerr'] = self.Y(start=self.p) - self.Y_pred()
+        self._pred_df = pd.DataFrame()
+        n_pred = self.n_training + self.n_testing
+        self._pred_df['ypred'] = np.zeros(n_pred)
+        self._pred_df['yerr'] = np.zeros(n_pred)
 
-        else:
-            self.predict()
-            n_pred = len(future)
-            _pred_df = pd.DataFrame()
-            _pred_df['ypred'] = np.zeros(n_pred)
-            _pred_df['yerr'] = np.zeros(n_pred)
-            y = copy.copy(self.Y(start=-self.p))
-            for i in range(n_pred):
-                pred = self._a_hat[::-1].dot(y)
-                y[:-1] = y[1:]
-                y[-1] = pred
-                _pred_df['ypred'][i] = pred
-            _pred_df["yerr"] = future - _pred_df['ypred']
+        self._pred_df['ypred'][
+            :self.n_training - self.p] = self._emb_matrix.dot(self._a_hat)
 
-            self._pred_df = self._pred_df.append(_pred_df, ignore_index=True)
+        y = copy.copy(self.Y_training(start=-self.p))
+        for i in range(self.n_training - self.p, n_pred):
+            pred = self._a_hat[::-1].dot(y)
+            y[:-1] = y[1:]
+            y[-1] = pred
+            self._pred_df['ypred'][i] = pred
+
+        ground_truth = np.concatenate((self.Y_training(), self.Y_testing()))
+        self._pred_df["yerr"] = ground_truth - self.Y_pred()
 
     def spectrum(self,
                  step=1e-2,

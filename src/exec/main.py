@@ -12,7 +12,7 @@ sns.set(color_codes=True)
 
 from process_data import data_from_file
 
-from Regression.forecast import AutoRegressive, AutoCorrelation
+from Regression import AutoRegressive, AutoCorrelation
 
 # file_name = "finPredProb.mat"
 # file_name = "co2.mat"
