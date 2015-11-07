@@ -9,43 +9,66 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-class Regression:
+class RegressionModel:
 
     def __init__(self,
-                 data=None,
+                 data_dict=None,
                  **kwargs):
-        
-        assert data.has_key('ytrain')
+
+        assert data_dict.has_key('ytrain')
 
         self._training_df = pd.DataFrame()
 
-        self.n_training = len(data['ytrain'])
-        self._training_df['y'] = data['ytrain']
-        if data.has_key('xtrain'):
-            self._training_df['x'] = data['xtrain']
+        self.n_training = len(data_dict['ytrain'])
+        self._training_df['y'] = data_dict['ytrain']
+        if data_dict.has_key('xtrain'):
+            self._training_df['x'] = data_dict['xtrain']
         else:
             self._training_df['x'] = np.arange(self.n_training)
-
-        if data.has_key('ytest'):
+        if data_dict.has_key('ytruthtrain'):
+            self._training_df['ytruth'] = data_dict['ytruthtrain']
+            
+            
+        if data_dict.has_key('ytest'):
             self._testing_df = pd.DataFrame()
-            self.n_testing = len(data['ytest'])
-            self._testing_df['y'] = data['ytest']
-            if data.has_key('xtest'):
-                self._testing_df['x'] = data['xtest']
+            self.n_testing = len(data_dict['ytest'])
+            self._testing_df['y'] = data_dict['ytest']
+            if data_dict.has_key('xtest'):
+                self._testing_df['x'] = data_dict['xtest']
             else:
                 self._testing_df['x'] = np.arange(self.n_testing)
+            if data_dict.has_key('ytruthtest'):
+                self._testing_df['ytruth'] = data_dict['ytruthtest']
 
         print("done")
         print("-" * 50)
         print("showing headers for verification...")
-        
+
         print("Training Data :")
         print(self._training_df.head())
-        
+
         if hasattr(self, "n_testing"):
             print("Testing Data :")
             print(self._testing_df.head())
-
+            
+        self.center_normalize()
+        
+        print("NB: data has been centered and normalized")
+            
+    def center_normalize(self):
+        
+        self.y_mean = np.mean(self.Y_training())
+        self.y_std = np.std(self.Y_training())
+        
+        self._training_df['y'] = (self.Y_training() - self.y_mean) / self.y_std
+        
+        if hasattr(self, "n_testing"):
+            self._testing_df['y'] = (self.Y_testing() - self.y_mean) / self.y_std
+    
+        if hasattr(self._training_df, "ytruth"):
+            self._training_df['ytruth'] = (self.Y_truth_training() - self.y_mean) / self.y_std
+            self._testing_df['ytruth'] = (self.Y_truth_testing() - self.y_mean) / self.y_std
+            
     def X_training(self,
                    indices=None,
                    start=None,
@@ -70,7 +93,7 @@ class Regression:
                    indices=None,
                    start=None,
                    stop=None):
-
+        
         if hasattr(indices, "__len__"):
             return self._training_df.y.values[indices]
         else:
@@ -106,11 +129,31 @@ class Regression:
         else:
             return self._pred_df.yerr.values[start:stop]
         
+    def Y_truth_training(self,
+                         indices=None,
+                         start=None,
+                         stop=None):
+
+        if hasattr(indices, "__len__"):
+            return self._training_df.ytruth.values[indices]
+        else:
+            return self._training_df.ytruth.values[start:stop]
+
+    def Y_truth_testing(self,
+                        indices=None,
+                        start=None,
+                        stop=None):
+
+        if hasattr(indices, "__len__"):
+            return self._testing_df.ytruth.values[indices]
+        else:
+            return self._testing_df.ytruth.values[start:stop]
+
     def embed_data(self):
-        
+
         n = self.n_training - self.p
         self._emb_matrix = np.zeros((n, self.p))
-        
+
         for k in range(self.p):
             self._emb_matrix[:, k] = self.Y_training(start=self.p - 1 - k,
                                                      stop=self.p - 1 - k + n)

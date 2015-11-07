@@ -6,14 +6,14 @@ Date: 6 Nov 2015
 
 import numpy as np
 
-from regression import Regression
+from regression import RegressionModel
 
-class KalmanFilter(Regression):
+class KalmanFilter(RegressionModel):
     
     def __init__(self,
                  data):
     
-        Regression.__init__(self, 
+        RegressionModel.__init__(self, 
                           data)
         
         self.dim = -1

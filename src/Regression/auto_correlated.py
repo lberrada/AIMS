@@ -10,15 +10,15 @@ import copy
 
 import scipy.linalg
 
-from regression import Regression
+from regression import RegressionModel
 
-class AutoCorrelation(Regression):
+class AutoCorrelation(RegressionModel):
 
     def __init__(self,
                  y,
                  p=5):
 
-        Regression.__init__(self,
+        RegressionModel.__init__(self,
                             y)
         self.p = p
 

@@ -8,16 +8,16 @@ import numpy as np
 import pandas as pd
 import copy
 
-from regression import Regression
+from regression import RegressionModel
 
 
-class AutoRegressive(Regression):
+class AutoRegressive(RegressionModel):
 
     def __init__(self,
                  y,
                  p=5):
 
-        Regression.__init__(self,
+        RegressionModel.__init__(self,
                             y)
         self.p = p
 

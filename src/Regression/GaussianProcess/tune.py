@@ -8,13 +8,7 @@ import numpy as np
 import scipy.stats
 import scipy.optimize
 import csv
-from build import train_on
 from params import get_params
-
-import sys
-import time
-sys.path.append("../../DEI/src/")
-from utils import timeit
 
 def optimize_hyperparameters(self, out=""):
     
@@ -41,9 +35,8 @@ def optimize_hyperparameters(self, out=""):
         
         self.params = params
         
-        mu, K = train_on(self,
-                         XX=self.X_training(),
-                         Xtesting=self.X_training())
+        mu = self.compute_mu(Xtesting=self.X_training())
+        K = self.compute_K(XX=self.X_training())
         
         Ycentered = self.Y_training() - mu
         

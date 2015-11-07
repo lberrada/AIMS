@@ -4,6 +4,7 @@ Author: Leonard Berrada
 Date: 2 Nov 2015
 """
 
+from regression import RegressionModel
 from auto_correlated import AutoCorrelation
 from auto_regressive import AutoRegressive
 from kalman import KalmanFilter
