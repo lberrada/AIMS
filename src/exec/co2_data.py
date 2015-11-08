@@ -28,16 +28,14 @@ if model.lower() == "ar":
     my_ar = AutoRegressive(data_dict, p)
     my_ar.fit()
     my_ar.predict()
-    my_ar.plot_var("Y_training", lag=p, set_="train")
-    my_ar.plot_var('Y_pred', show=True, c="red")
+    my_ar.display()
 
 if model.lower() == "ac":
     p = 50
     my_ac = AutoCorrelation(data_dict, p)
     my_ac.fit()
     my_ac.predict()
-    my_ac.plot_var("Y_training", lag=p, set_="train")
-    my_ac.plot_var('Y_pred', show=True, c="red")
+    my_ac.display()
     my_ac.spectrum()
 
 
@@ -50,7 +48,7 @@ if model.lower() == "gp":
     use_means = "linear + periodic"
     estimator = "MLE"
 
-    my_gp = GaussianProcess(data=data_dict,
+    my_gp = GaussianProcess(data_dict=data_dict,
                             use_kernels=use_kernels,
                             use_means=use_means,
                             estimator=estimator,

@@ -8,6 +8,8 @@ import numpy as np
 import pandas as pd
 import copy
 
+import matplotlib.pyplot as plt
+
 import scipy.linalg
 
 from regression import RegressionModel
@@ -70,3 +72,18 @@ class AutoCorrelation(RegressionModel):
             ak_x_exp = [-self._a_hat[i] *
                         np.exp(-1j * 2. * np.pi * self._f_grid[k] * i * Ts) for i in range(self.p)]
             self.spectrum[k] /= abs(1. + np.sum(ak_x_exp)) ** 2
+            
+    def display(self):
+        
+        plt.plot(self.X_training(stop=-self.p), 
+                 self.Y_training(start=self.p),
+                 c='k')
+        
+        plt.plot(self.X_testing(), 
+                 self.Y_testing(),
+                 c='b')
+        
+        plt.plot(self.Y_pred(),
+                 c='r')
+        
+        plt.show()

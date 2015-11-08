@@ -8,6 +8,8 @@ import numpy as np
 import pandas as pd
 import copy
 
+import matplotlib.pyplot as plt
+
 from regression import RegressionModel
 
 
@@ -48,3 +50,22 @@ class AutoRegressive(RegressionModel):
 
         ground_truth = np.concatenate((self.Y_training(), self.Y_testing()))
         self._pred_df["yerr"] = ground_truth - self.Y_pred()
+        
+    def display(self):
+        
+        plt.plot(self.X_training(stop=-self.p), 
+                 self.Y_training(start=self.p),
+                 c='k')
+        
+        print(self.X_testing())
+        
+        plt.plot(self.X_testing(), 
+                 self.Y_testing(),
+                 c='b')
+        
+        plt.plot(self.Y_pred(),
+                 c='r')
+        
+        plt.show()
+        
+        

@@ -5,39 +5,32 @@ Date: 6 Nov 2015
 """
 
 import numpy as np
+import pandas as pd
 
 from regression import RegressionModel
 
+
 class KalmanFilter(RegressionModel):
-    
+
     def __init__(self,
-                 data):
-    
-        RegressionModel.__init__(self, 
-                          data)
+                 data,
+                 p):
+
+        RegressionModel.__init__(self,
+                                 data)
+
+        self.p = p
+
+
+    def fit(self):
         
-        self.dim = -1
+        self._pred_df = pd.DataFrame()
+        n_pred = self.n_training + self.n_testing
+        self._pred_df['ypred'] = np.zeros(n_pred)
+        self._pred_df['yerr'] = np.zeros(n_pred)
         
-        # state transition model
-        self.F = np.eye(self.dim)
-        
-        # control input
-        self.B = np.eye(self.dim)
-        
-        # observation model
-        self.H = np.eye(self.dim)
-        
-    def predict(self, future=None):
-        
-        if not hasattr(future, "__len__"):
-            n_pred = len(self.Y())-1
-            self._pred_df['ypred'] = np.zeros(n_pred)
-            self._pred_df['yerr'] = np.zeros(n_pred)
+        Q = np.eye(self.p)
+
+        for i in range(self.n_training):
+            pass
             
-            old_x = np.random.normal(self.dim)
-            for k in range(n_pred):
-                pred_x = self.F.dot(old_x) + self.B.dot(self.Y(k))
-                pred_cov = self.F.dot()
-                
-        
-        

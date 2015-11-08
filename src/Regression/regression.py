@@ -27,8 +27,7 @@ class RegressionModel:
             self._training_df['x'] = np.arange(self.n_training)
         if data_dict.has_key('ytruthtrain'):
             self._training_df['ytruth'] = data_dict['ytruthtrain']
-            
-            
+
         if data_dict.has_key('ytest'):
             self._testing_df = pd.DataFrame()
             self.n_testing = len(data_dict['ytest'])
@@ -36,9 +35,12 @@ class RegressionModel:
             if data_dict.has_key('xtest'):
                 self._testing_df['x'] = data_dict['xtest']
             else:
-                self._testing_df['x'] = np.arange(self.n_testing)
+                self._testing_df['x'] = self.n_training + \
+                    np.arange(self.n_testing)
             if data_dict.has_key('ytruthtest'):
                 self._testing_df['ytruth'] = data_dict['ytruthtest']
+        else:
+            self.n_testing = 0
 
         print("done")
         print("-" * 50)
@@ -47,28 +49,31 @@ class RegressionModel:
         print("Training Data :")
         print(self._training_df.head())
 
-        if hasattr(self, "n_testing"):
+        if self.n_testing:
             print("Testing Data :")
             print(self._testing_df.head())
-            
+
         self.center_normalize()
-        
+
         print("NB: data has been centered and normalized")
-            
+
     def center_normalize(self):
-        
+
         self.y_mean = np.mean(self.Y_training())
         self.y_std = np.std(self.Y_training())
-        
+
         self._training_df['y'] = (self.Y_training() - self.y_mean) / self.y_std
-        
-        if hasattr(self, "n_testing"):
-            self._testing_df['y'] = (self.Y_testing() - self.y_mean) / self.y_std
-    
+
+        if self.n_testing:
+            self._testing_df['y'] = (
+                self.Y_testing() - self.y_mean) / self.y_std
+
         if hasattr(self._training_df, "ytruth"):
-            self._training_df['ytruth'] = (self.Y_truth_training() - self.y_mean) / self.y_std
-            self._testing_df['ytruth'] = (self.Y_truth_testing() - self.y_mean) / self.y_std
-            
+            self._training_df['ytruth'] = (
+                self.Y_truth_training() - self.y_mean) / self.y_std
+            self._testing_df['ytruth'] = (
+                self.Y_truth_testing() - self.y_mean) / self.y_std
+
     def X_training(self,
                    indices=None,
                    start=None,
@@ -93,7 +98,7 @@ class RegressionModel:
                    indices=None,
                    start=None,
                    stop=None):
-        
+
         if hasattr(indices, "__len__"):
             return self._training_df.y.values[indices]
         else:
@@ -103,6 +108,9 @@ class RegressionModel:
                   indices=None,
                   start=None,
                   stop=None):
+        
+        if not self.n_testing:
+            return []
 
         if hasattr(indices, "__len__"):
             return self._testing_df.y.values[indices]
@@ -128,7 +136,7 @@ class RegressionModel:
             return self._pred_df.yerr.values[indices]
         else:
             return self._pred_df.yerr.values[start:stop]
-        
+
     def Y_truth_training(self,
                          indices=None,
                          start=None,

@@ -56,7 +56,7 @@ class GaussianProcess(RegressionModel):
         self.init_params()
 
     def init_params(self):
-
+        
         if not hasattr(self.params, "__len__"):
             print("hyper-parameters not given, random initialization...")
             my_params = get_params(self.use_kernels,
@@ -76,6 +76,8 @@ class GaussianProcess(RegressionModel):
                 else:
                     self.params[k] = scipy.stats.norm.rvs(loc=mean_params[k],
                                                           scale=std_params[k])
+                    
+            self.update_scales()
                     
             self.tune_hyperparameters()
 
@@ -174,9 +176,14 @@ class GaussianProcess(RegressionModel):
 
         print("-" * 50)
         print('computing score...')
+        
+        if hasattr(self._testing_df, 'ytruth'):
+            ground_truth = self.Y_truth_testing()
+        else:
+            ground_truth = self.Y_testing()
 
         ssres = np.sum(
-            np.power(self.Y_pred_mean() - self.Y_truth_testing(), 2))
+            np.power(self.Y_pred_mean() - ground_truth, 2))
         print("RMS :", np.sqrt(ssres) / self.n_testing)
         sstot = np.sum(
             np.power(self.Y_pred_mean() - np.mean(self.Y_pred_mean()), 2))

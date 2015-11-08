@@ -11,7 +11,7 @@ def predict(self,
             show_plot=True):
 
     print("predicting data...")
-
+    
     mu_training = self.compute_mu(Xtesting=self.X_training())
     K = self.compute_K(XX=self.X_training())
 
@@ -25,7 +25,7 @@ def predict(self,
     mu_testing = self.compute_mu(Xtesting=self.X_testing())
 
     for i in range(self.n_testing):
-
+        
         xstar = self.X_testing([i])
 
         if self.sequential_mode:
