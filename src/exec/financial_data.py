@@ -25,22 +25,21 @@ if model.lower() == 'kf':
     p = 10
     kf = KalmanFilter(data_dict, p)
     kf.fit()
-    kf.display()
-
+    kf.display(out="./fin_kf.png")
 
 if model.lower() == "ar":
-    p = 200
+    p = 50
     my_ar = AutoRegressive(data_dict, p)
     my_ar.fit()
     my_ar.predict()
-    my_ar.display()
+    my_ar.display(out="./fin_ar.png")
 
 if model.lower() == "ac":
     p = 50
     my_ac = AutoCorrelation(data_dict, p)
     my_ac.fit()
     my_ac.predict()
-    my_ac.display()
+    my_ac.display(out="./fin_ac.png")
     my_ac.spectrum()
 
 
@@ -50,10 +49,11 @@ if model.lower() == "gp":
     use_kernels = "exponential_quadratic* cosine"
     for _ in range(Q - 1):
         use_kernels += "+ exponential_quadratic * cosine"
-    use_means = "linear + periodic"
+#     use_kernels = 'rational_quadratic + periodic'
+    use_means = "constant"
     estimator = "MLE"
 
-    my_gp = GaussianProcess(data=data_dict,
+    my_gp = GaussianProcess(data_dict=data_dict,
                             use_kernels=use_kernels,
                             use_means=use_means,
                             estimator=estimator,
@@ -61,4 +61,4 @@ if model.lower() == "gp":
 
     my_gp.predict()
     my_gp.compute_score()
-    my_gp.show_prediction()
+    my_gp.show_prediction(out="./fin_gp.png")

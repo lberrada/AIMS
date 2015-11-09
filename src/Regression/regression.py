@@ -61,9 +61,9 @@ class RegressionModel:
 
         self.y_mean = np.mean(self.Y_training())
         self.y_std = np.std(self.Y_training())
-
+        
         self._training_df['y'] = (self.Y_training() - self.y_mean) / self.y_std
-
+        
         if self.n_testing:
             self._testing_df['y'] = (
                 self.Y_testing() - self.y_mean) / self.y_std
@@ -195,3 +195,35 @@ class RegressionModel:
 
         if show:
             plt.show()
+            
+    def display(self, out=""):
+
+        plt.plot(self.X_training(stop=-self.p),
+                 self.Y_training(start=self.p),
+                 c='k')
+        
+        try:
+            plt.plot(self.X_testing() - self.p,
+                     self.Y_testing(),
+                     c='b')
+        except:
+            pass
+
+        plt.plot(self.Y_pred(),
+                 c='r')
+        
+        plt.plot(self.Y_error(),
+                 c='g',
+                 alpha=0.5)
+        
+        if out:
+            try:
+                plt.savefig(out,
+                            transparent=False,
+                            dpi=200,
+                            bbox_inches='tight')
+            except:
+                print(
+                    "could not save plot in %s, please make sure directory exists" % out)
+
+        plt.show()

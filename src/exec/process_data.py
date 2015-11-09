@@ -59,7 +59,7 @@ def process_mat(file_name, **kwargs):
     elif file_name == "co2.mat":
         all_data = data_dict['co2'].flatten()
         data['ytrain'] = all_data[:500]
-        data['ytest'] = all_data
+        data['ytest'] = all_data[500:]
         return data
 
     elif file_name == "sunspots.mat":

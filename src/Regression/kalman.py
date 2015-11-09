@@ -27,7 +27,7 @@ class KalmanFilter(RegressionModel):
     def fit(self):
 
         self._pred_df = pd.DataFrame()
-        n_pred = self.n_training + self.n_testing
+        n_pred = self.n_training + self.n_testing - self.p
         self._pred_df['ypred'] = np.zeros(n_pred)
         self._pred_df['yerr'] = np.zeros(n_pred)
 
@@ -66,28 +66,8 @@ class KalmanFilter(RegressionModel):
             y[-1] = pred
             self._pred_df['ypred'][i] = pred
 
-        ground_truth = np.concatenate((self.Y_training(), self.Y_testing()))
+        ground_truth = np.concatenate((self.Y_training(start=self.p), self.Y_testing()))
         self._pred_df["yerr"] = ground_truth - self.Y_pred()
         
 
-    def display(self):
-
-        plt.plot(self.X_training(stop=-self.p),
-                 self.Y_training(start=self.p),
-                 c='k')
-        
-        try:
-            plt.plot(self.X_testing(), 
-                     self.Y_testing(),
-                     c='b')
-        except:
-            pass
-
-        plt.plot(self.Y_pred(),
-                 c='r')
-        
-        plt.plot(self.Y_error(),
-                 c='g',
-                 alpha=0.5)
-
-        plt.show()
+    
