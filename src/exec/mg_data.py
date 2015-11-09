@@ -14,7 +14,7 @@ file_name = "mg.mat"
 data_dict = data_from_file(file_name)
 
 model = "GP"
-# model = "AR"
+model = "AR"
 # model = "AC"
 
 
@@ -36,12 +36,12 @@ if model.lower() == "ac":
 
 if model.lower() == "gp":
 
-#     Q = 3
-#     use_kernels = "exponential_quadratic* cosine"
-#     for _ in range(Q - 1):
-#         use_kernels += "+ exponential_quadratic * cosine"
-    use_kernels = 'rational_quadratic + periodic'
-    use_means = "periodic"
+    Q = 3
+    use_kernels = "exponential_quadratic* cosine"
+    for _ in range(Q - 1):
+        use_kernels += "+ exponential_quadratic * cosine"
+#     use_kernels = 'rational_quadratic + periodic'
+    use_means = "constant"
     estimator = "MLE"
 
     my_gp = GaussianProcess(data_dict=data_dict,

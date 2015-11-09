@@ -44,7 +44,11 @@ def process_mat(file_name, **kwargs):
         return data
 
     elif file_name == "finPredProb.mat":
-        data['ytrain'] = data_dict['ttr'].flatten()
+        my_array = data_dict['ttr'].flatten()
+        data['ytrain'] = my_array
+#         n_training = int(0.7 * len(my_array))
+#         data['ytrain'] = my_array[:n_training]
+#         data['ytest'] = my_array[n_training:]
         return data
 
     elif file_name == "mg.mat":

@@ -12,6 +12,7 @@ from Regression import RegressionModel
 import copy
 import csv
 import matplotlib.pyplot as plt
+import numpy as np
 import seaborn as sns
 sns.set(color_codes=True)
 
@@ -237,8 +238,13 @@ class GaussianProcess(RegressionModel):
         else:
             plt.plot(self.X_training(),
                      self.Y_training(),
-                     'b-',
+                     'k-',
                      ms=4)
+            
+        plt.plot(self.X_testing(),
+                 self.Y_testing(),
+                 'b-',
+                 ms=4)
 
         plt.plot(Ttesting,
                  self.Y_pred_mean(),

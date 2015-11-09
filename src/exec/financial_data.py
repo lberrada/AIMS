@@ -24,25 +24,23 @@ model = "KF"
 if model.lower() == 'kf':
     p = 10
     kf = KalmanFilter(data_dict, p)
-    kf.apply()
+    kf.fit()
     kf.display()
 
 
 if model.lower() == "ar":
-    p = 50
+    p = 200
     my_ar = AutoRegressive(data_dict, p)
     my_ar.fit()
     my_ar.predict()
-    my_ar.plot_var("Y_training", lag=p, set_="train")
-    my_ar.plot_var('Y_pred', show=True, c="red")
+    my_ar.display()
 
 if model.lower() == "ac":
     p = 50
     my_ac = AutoCorrelation(data_dict, p)
     my_ac.fit()
     my_ac.predict()
-    my_ac.plot_var("Y_training", lag=p, set_="train")
-    my_ac.plot_var('Y_pred', show=True, c="red")
+    my_ac.display()
     my_ac.spectrum()
 
 

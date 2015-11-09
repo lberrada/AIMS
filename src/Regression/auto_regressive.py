@@ -57,8 +57,6 @@ class AutoRegressive(RegressionModel):
                  self.Y_training(start=self.p),
                  c='k')
         
-        print(self.X_testing())
-        
         plt.plot(self.X_testing(), 
                  self.Y_testing(),
                  c='b')
