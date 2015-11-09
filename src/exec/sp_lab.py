@@ -7,8 +7,11 @@ Date: 2 Nov 2015
 import sys
 sys.path.append("../")
 
-import seaborn as sns
-sns.set(color_codes=True)
+try:
+    import seaborn as sns
+    sns.set(color_codes=True)
+except:
+    pass
 
 from process_data import data_from_file
 

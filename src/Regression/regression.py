@@ -8,6 +8,12 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+try:
+    import seaborn as sns
+    sns.set(color_codes=True)
+except:
+    pass
+
 
 class RegressionModel:
 

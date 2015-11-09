@@ -13,8 +13,11 @@ import copy
 import csv
 import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sns
-sns.set(color_codes=True)
+try:
+    import seaborn as sns
+    sns.set(color_codes=True)
+except:
+    pass
 
 import scipy.stats
 
