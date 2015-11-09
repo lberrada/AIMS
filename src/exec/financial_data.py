@@ -7,7 +7,7 @@ Date: 5 Nov 2015
 import sys
 sys.path.append("../")
 
-from Regression import AutoRegressive, AutoCorrelation, GaussianProcess
+from Regression import AutoRegressive, AutoCorrelation, GaussianProcess, KalmanFilter
 
 from process_data import data_from_file
 
@@ -19,6 +19,13 @@ data_dict = data_from_file(file_name)
 model = "GP"
 model = "AR"
 # model = "AC"
+model = "KF"
+
+if model.lower() == 'kf':
+    p = 10
+    kf = KalmanFilter(data_dict, p)
+    kf.apply()
+    kf.display()
 
 
 if model.lower() == "ar":
