@@ -18,8 +18,8 @@ data_dict = data_from_file(file_name)
 
 model = "GP"
 model = "AR"
-# model = "AC"
-model = "KF"
+model = "AC"
+# model = "KF"
 
 if model.lower() == 'kf':
     p = 10

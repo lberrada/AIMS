@@ -200,21 +200,25 @@ class RegressionModel:
 
         plt.plot(self.X_training(stop=-self.p),
                  self.Y_training(start=self.p),
-                 c='k')
+                 c='k',
+                 ms=4)
         
         try:
             plt.plot(self.X_testing() - self.p,
                      self.Y_testing(),
-                     c='b')
+                     c='b',
+                     ms=4)
         except:
             pass
 
         plt.plot(self.Y_pred(),
-                 c='r')
+                 c='r',
+                 ms=4)
         
         plt.plot(self.Y_error(),
                  c='g',
-                 alpha=0.5)
+                 alpha=0.5,
+                 ms=4)
         
         if out:
             try:

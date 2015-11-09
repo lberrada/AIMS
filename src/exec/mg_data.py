@@ -14,8 +14,8 @@ file_name = "mg.mat"
 data_dict = data_from_file(file_name)
 
 model = "GP"
-model = "AR"
-# model = "AC"
+# model = "AR"
+model = "AC"
 # model = "KF"
 
 if model.lower() == 'kf':
@@ -38,6 +38,7 @@ if model.lower() == "ac":
     my_ac.predict()
     my_ac.display(out="./mg_ac.png")
     my_ac.spectrum()
+    my_ac.plot_attr("spectrum", show=True)
 
 
 if model.lower() == "gp":

@@ -61,7 +61,7 @@ class KalmanFilter(RegressionModel):
         
         y = copy.copy(self.Y_training(start=-self.p))
         for i in range(self.n_training - self.p, n_pred):
-            pred = self._a_hat[::-1].dot(y)
+            pred = float(self._a_hat.dot(y))
             y[:-1] = y[1:]
             y[-1] = pred
             self._pred_df['ypred'][i] = pred
