@@ -61,8 +61,6 @@ if model.lower() == "gp":
                             estimator=estimator,
                             sequential_mode=False)
 
-    my_gp.update_scales()
-    my_gp.tune_hyperparameters()
     my_gp.predict()
     my_gp.compute_score()
     my_gp.show_prediction()

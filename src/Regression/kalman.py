@@ -43,7 +43,7 @@ class KalmanFilter(RegressionModel):
 
             # aux variables
             H = self.Y_training(start=i, stop=i + self.p).reshape(1, self.p)
-            obs = float(self.Y_training([i+self.p]))
+            obs = float(self.Y_training([i + self.p]))
             nu = obs - float(H.dot(a_hat))
             S = float(H.dot(P_pred).dot(H.T)) + R
             K = P_pred.dot(H.T) * 1. / S
@@ -51,11 +51,12 @@ class KalmanFilter(RegressionModel):
             # update step
             a_hat += K * nu
             P_up = (np.eye(self.p) - K.dot(H)).dot(P_pred)
-            
+
             # predict data value
             self._pred_df['ypred'][i] = float(H.dot(a_hat))
 
         self._pred_df['yerr'] = self.Y_training(start=self.p) - self.Y_pred()
+        self._a_hat = a_hat
 
     def display(self):
 

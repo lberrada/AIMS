@@ -36,11 +36,12 @@ if model.lower() == "ac":
 
 if model.lower() == "gp":
 
-    Q = 3
-    use_kernels = "exponential_quadratic* cosine"
-    for _ in range(Q - 1):
-        use_kernels += "+ exponential_quadratic * cosine"
-    use_means = "linear + periodic"
+#     Q = 3
+#     use_kernels = "exponential_quadratic* cosine"
+#     for _ in range(Q - 1):
+#         use_kernels += "+ exponential_quadratic * cosine"
+    use_kernels = 'rational_quadratic + periodic'
+    use_means = "periodic"
     estimator = "MLE"
 
     my_gp = GaussianProcess(data_dict=data_dict,
@@ -49,8 +50,6 @@ if model.lower() == "gp":
                             estimator=estimator,
                             sequential_mode=False)
 
-    my_gp.update_scales()
-    my_gp.tune_hyperparameters()
     my_gp.predict()
     my_gp.compute_score()
     my_gp.show_prediction()
